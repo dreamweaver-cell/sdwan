@@ -1,0 +1,8 @@
+---
+- name: Site Acceptance Test (SAT)
+  hosts: sdwan
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.import_tasks: create_change_task.yml

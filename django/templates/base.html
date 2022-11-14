@@ -1,0 +1,40 @@
+{# Base template for all snapweb pages #}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'base.css'%}"/>
+    <link rel="stylesheet" href="{% static 'footer.css'%}"/>
+    <title>{% block title %}Home5{% endblock %} | SNAP</title>
+  </head>
+
+  <body>
+    <!-- Page content wrapper-->
+    <div class="sidewrapper">
+
+      <!-- Sidebar -->
+      {% include 'sidenav.html' %}
+
+      <!-- Page content-->
+      <div class="container-fluid" id="content">
+          {% include 'header.html' %}
+          {% block content %}No content..{% endblock %}
+        <div class="position-relative top-0 end-0" style="padding: 50px 10px ">
+          {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+        </div>
+      </div>
+
+      <!-- Footer -->
+      {% block footer %}
+      {% include 'footer.html' %}
+      {% endblock %}
+    </div>
+
+  </body>
+</html>

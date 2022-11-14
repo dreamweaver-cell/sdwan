@@ -1,0 +1,14 @@
+{
+    "vrf": "vpn12",
+    "ipv4": "0.0.0.0",
+    "ipv4_mask": "0.0.0.0",
+    "nexthop_if": "Tunnel50",
+    "nexthop_ip": "{{ router.services.zscaler.primary_tunnel.ipv4 | ipaddr('net') | ipaddr('2') | ipv4('address')  }}"
+},
+{
+    "vrf": "vpn12",
+    "ipv4": "0.0.0.0",
+    "ipv4_mask": "0.0.0.0",
+    "nexthop_if": "Tunnel51",
+    "nexthop_ip": "{{ router.services.zscaler.secondary_tunnel.ipv4 | ipaddr('net') | ipaddr('2') | ipv4('address')  }}"
+},

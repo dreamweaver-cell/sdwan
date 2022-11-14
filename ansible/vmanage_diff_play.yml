@@ -1,0 +1,55 @@
+---
+- name: Diff hostname and vmanage playbook
+  strategy: free
+  hosts:
+    - sdwan
+    - "!manual"
+  connection: network_cli
+  gather_facts: false
+  tasks:
+    - name: check connection
+      ansible.builtin.command: "ping -c 1 {{ inventory_hostname }}"
+      delegate_to: localhost
+      changed_when: false
+      failed_when: false
+      register: ping_out
+
+    - name: quit if not reachable
+      ansible.builtin.meta: end_host
+      when: ping_out['rc'] != 0
+
+    - name: show sdwan connections
+      cisco.ios.ios_command:
+        commands: show ip vrf
+      register: output
+      failed_when: false
+
+    - ansible.builtin.set_fact:
+        migrated: "{{ 'MGMT' not in output.stdout[0] }}"
+
+    - block:
+        - name: Collecting Diff and comparing with snapconfig
+          vmanage_diff:
+            hostname: "{{ inventory_hostname }}"
+            log: true
+          register: result
+
+        - ansible.builtin.debug:
+            msg: "{{ result.meta }}"
+
+        - name: No Errors found removing log file
+          ansible.builtin.file:
+            path: "{{playbook_dir }}/../logs/diffs/_fail_{{ inventory_hostname }}.log"
+            state: "absent"
+          when: not result.meta.changes and result.module_stderr is not defined 
+
+      rescue:
+        - name: Failure in provisioning
+          ansible.builtin.debug:
+            msg: "Router {{ inventory_hostname }} failed provisioning"
+        - name: writing Error log
+          ansible.builtin.copy:
+            content: 'Failed to provisioin  {{lookup(''pipe'',''date -u +%Y-%m-%d" "%H:%M:00'')}}:{{ result.module_stderr }}'
+            dest: "{{playbook_dir }}/../logs/diffs/_fail_{{ inventory_hostname }}.log"
+          delegate_to: localhost      
+      when: migrated

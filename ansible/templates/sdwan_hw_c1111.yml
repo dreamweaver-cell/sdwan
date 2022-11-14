@@ -1,0 +1,4 @@
+---
+internet_interface: "GigabitEthernet0/0/0"
+vpls_interface: "GigabitEthernet0/0/1"
+lan_interface: "GigabitEthernet0/1/0"

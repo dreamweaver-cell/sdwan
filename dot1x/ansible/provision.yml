@@ -1,0 +1,135 @@
+---
+# Push dot1x configuration to switch
+# MAC_ADDRESS: includes MAC address and description
+# SWITCH_UPLINKS includes all uplinkports
+# SWITCH_PORTS includes all ethernet ports in the switch
+
+- name: implement dot1x to switch
+  hosts: switch
+  connection: network_cli
+  #strategy: free
+  gather_facts: false
+  vars:
+    SWITCH_UPLINKS: []
+    SWITCH_PORTS: []
+    MAC_ADDRESS: []
+    FILENAME: "{{inventory_hostname}}.cfg"
+    CFGFILE: "swixconfig/{{ FILENAME }}"
+
+  tasks:
+  - block:
+    # Check that limit is set
+    - name: check limit is set
+      ansible.builtin.fail:
+        msg: "you must use -l or --limit"
+      when: ansible_limit is not defined
+      run_once: true
+
+    # Collect IOS facts
+    - name: set facts from {{ inventory_hostname }}
+      cisco.ios.ios_facts:
+        gather_subset: all
+
+    # Collect meta data from switch
+    - name: collect data from switch
+      ansible.builtin.include_role:
+        name: switch_fact
+
+    # Search for uplink ports
+    - ansible.builtin.set_fact:
+        SWITCH_UPLINKS: "{{ SWITCH_UPLINKS + [item.key]}}"
+      when: item.value[0].host is search("rtr|swi")
+      with_dict: "{{ ansible_facts.net_neighbors  }}"
+
+    # Search for available ethernet ports
+    - ansible.builtin.set_fact:
+        SWITCH_PORTS: "{{ SWITCH_PORTS + [item.key]}}"
+      when: item.key is search("Ethernet[0-9]\/[0-9]\/[0-9]") and item.key not in SWITCH_UPLINKS
+      with_dict: "{{ ansible_facts.net_interfaces  }}"
+
+    #- name: notify MAC info
+    #  ansible.builtin.include_role:
+    #    name: notify
+    #    tasks_from: mac_info.yml
+
+    # Create jinja2 template
+    - name: create {{ CFGFILE }}
+      ansible.builtin.copy:
+        content: "{{ lookup('template', 'templates/dot1x_interface.j2') }}"
+        dest: "{{ CFGFILE }}"
+      delegate_to: localhost
+
+    rescue:
+      - name: Notify on errors
+        ansible.builtin.include_role:
+          name: notify
+          tasks_from: provision_error.yml
+      - ansible.builtin.fail:
+          msg: Error during config preparations
+
+  # Default all interfaces
+  - name: set all interfaces to default
+    cisco.ios.ios_config:
+      lines:
+        - "default interface {{ item }}"
+    loop: "{{ SWITCH_PORTS }}"
+
+  - block:
+    - name: enable SCP-server on switch
+      cisco.ios.ios_config:
+        lines:
+          - ip scp server enable
+
+    - name: upload config to switch
+      ansible.netcommon.net_put:
+        src: "{{ CFGFILE }}"
+        dest: "flash:/{{ FILENAME }}"
+        protocol: scp
+      vars:
+        ansible_command_timeout: 166
+        ansible_connection: ansible.netcommon.network_cli
+
+    - name: copy template to startup configuration
+      cisco.ios.ios_command:
+        commands:
+          - command: "copy flash:/{{ FILENAME }} running-config"
+            prompt: 'Destination filename \[running-config\]'
+            answer: "\r"
+
+    - name: copy running configuration to startup configuration
+      cisco.ios.ios_command:
+        commands:
+          - command: copy running-config startup-config
+            prompt: 'Destination filename \[startup-config\]'
+            answer: "\r"
+
+    rescue:
+      - name: Notify on errors
+        ansible.builtin.include_role:
+          name: notify
+          tasks_from: provision_error.yml
+      - ansible.builtin.fail:
+          msg: Error during creation and upload of files
+  # SAT tests
+  - name: collect data from switch
+    ansible.builtin.include_role:
+      name: switch_sat_test
+
+  - name: Build critical test result
+    ansible.builtin.set_fact:
+      alarm_msg:
+          "{{ alarm_msg | default([]) + [ item ] }}"
+      critical_alarm: true
+    when: not item.successful and item.severity == 'critical'
+    loop: "{{ test_result }}"
+
+  - name: Build warnings test result
+    ansible.builtin.set_fact:
+      warnings_msg:
+          "{{ warnings_msg | default([]) + [ item ] }}"
+      warnings: true
+    when: not item.successful and item.severity == 'warning'
+    loop: "{{ test_result }}"
+
+  - ansible.builtin.debug:
+      msg: "{{ alarm_msg }}"

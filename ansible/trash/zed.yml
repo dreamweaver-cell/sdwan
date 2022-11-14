@@ -1,0 +1,13 @@
+---
+# Ansible Playbook to start migration of RWAN network devices
+
+- name: Playbook - ZED - Provisioning
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: Start zed collection script
+      ansible.builtin.command: zed --device {{ inventory_hostname }}
+      run_once: true

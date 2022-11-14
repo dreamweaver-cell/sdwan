@@ -1,0 +1,9 @@
+.vscode
+azure-pipelines.yml
+.python-version
+
+# Chache and temp files
+**/__pycache__
+.DS_Store
+.coverage
+.pytest_cache

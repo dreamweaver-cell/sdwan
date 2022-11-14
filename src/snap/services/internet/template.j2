@@ -1,0 +1,64 @@
+{# Provisioning template Dual router  v1.0 #}
+
+{% if redundant_router_type == "pri" %}
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-VPN0-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+                {% if dhcp_for_vpn0 %}
+				"templateName": "PROD-EDGE-INET-INT-DHCP-{{ region|upper }}",
+                {% else %}
+				"templateName": "PROD-EDGE-INET-INT-STATIC-NAT-{{ region|upper }}",
+                {% endif %}
+				"templateType": "cisco_vpn_interface"
+			}
+		]
+	}
+	{% if services.internet.interfaces|length >= 2 %}
+	,{
+		"templateName": "PROD-EDGE-VPN0-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+                {% if dhcp_for_vpn0 %}
+				"templateName": "PROD-EDGE-INET-INT2-DHCP-{{ region|upper }}",
+                {% else %}
+				"templateName": "PROD-EDGE-INET-INT2-STATIC-{{ region|upper }}",
+                {% endif %}
+				"templateType": "cisco_vpn_interface"
+			}
+		]
+	}{% endif %}]
+}
+{% endif %}
+{% if redundant_router_type == "sec" %}
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-VPN0-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+                {% if dhcp_for_vpn0 %}
+				"templateName": "PROD-EDGE-INET-INT-R2-DHCP-{{ region|upper }}",
+                {% else %}
+				"templateName": "PROD-EDGE-INET-INT-R2-STATIC-{{ region|upper }}",
+                {% endif %}
+				"templateType": "cisco_vpn_interface"
+			}
+		]
+	}
+	{% if services.internet.interfaces|length >= 2 %}
+	,{
+		"templateName": "PROD-EDGE-VPN0-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+                {% if dhcp_for_vpn0 %}
+				"templateName": "PROD-EDGE-INET-INT2-R2-DHCP-{{ region|upper }}",
+                {% else %}
+				"templateName": "PROD-EDGE-INET-INT2-R2-STATIC-{{ region|upper }}",
+                {% endif %}
+				"templateType": "cisco_vpn_interface"
+			}
+		]
+	}{% endif %}]
+}
+{% endif %}

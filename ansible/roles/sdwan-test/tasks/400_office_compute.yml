@@ -1,0 +1,4 @@
+---
+
+- ansible.builtin.set_fact:
+    test_result: "{{ test_result + [{ 'severity':'critical', 'description':'Test Office Compute vpn0 services', 'name':'test_400', 'successful': true  }] }}"

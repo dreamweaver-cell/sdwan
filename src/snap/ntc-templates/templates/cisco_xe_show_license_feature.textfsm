@@ -1,0 +1,9 @@
+Value LICENSE (\S*)
+Value ENFORCEMENT (yes|no)
+Value EVALUATION (yes|no)
+Value SUBSCRIPTION (yes|no)
+Value ENABLED (yes|no)
+Value RIGTHTOUSE (yes|no)
+
+Start
+  ^${LICENSE}\s+${ENFORCEMENT}\s*${EVALUATION}\s*${SUBSCRIPTION}\s*${ENABLED}\s*${RIGTHTOUSE} -> Record

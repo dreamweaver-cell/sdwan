@@ -1,0 +1,15 @@
+---
+- name: Detach template
+  vmanage_device_attachment:
+    user: "{{ vmanage_user }}"
+    host: "{{ vmanage_host }}"
+    password: "{{ vmanage_password }}"
+    device: "{{ inventory_hostname }}"
+    uuid: "{{ sdwan.part_number }}-{{ sdwan.crypto_sn }}"
+    system_ip: "{{ sdwan.system_system_ip }}"
+    site_id: "{{ sdwan.system_site_id }}"
+    template: "{{ inventory_hostname }}-snap"
+    variables: "{{ sdwan | default(omit) }}"
+    wait: true
+    state: "absent"
+  delegate_to: localhost

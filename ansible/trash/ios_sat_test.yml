@@ -1,0 +1,109 @@
+---
+# - name: Site Acceptance Test (SAT)
+#   hosts: sdwan
+#   connection: network_cli
+#   gather_facts: false
+
+#   tasks:
+
+# Wait for the device to get online
+- name: Wait 900 seconds, but only start checking after 20 sec
+  ansible.builtin.wait_for_connection:
+    delay: 20
+    timeout: 900
+
+# test connectivity on Guest Wifi
+- name: TEST 1 - Test reachability to 8.8.8.8 from Guest Wifi VRF (vManage vpn 900)
+  cisco.ios.ios_ping:
+    dest: 8.8.8.8
+    vrf: "900"
+  register: test1
+  ignore_errors: true
+
+# test connectivity on H&M internal network
+- name: TEST 2 - Test reachability to secc1327 from Client vrf (vManage vpn 12)
+  cisco.ios.ios_ping:
+    dest: 10.61.95.134
+    vrf: "12"
+  register: test2
+  ignore_errors: true
+
+# test connectivity on H&M internal network
+- name: TEST 3 - Test reachability to secc1327 from MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.61.95.134
+    vrf: "5"
+    source: loopback5
+  register: test3
+  ignore_errors: true
+
+# test arp entry on lan interface
+- name: TEST 4.0 - Test if ARP < 3  entries on Client vrf (vManage vpn 12)
+  cisco.ios.ios_command:
+    commands:
+      - show ip arp vrf 12
+  register: arp_output
+
+- name: TEST 4.1 - Parse ARP output and set fact device_neighbors
+  ansible.builtin.set_fact:
+    device_neighbors: "{{ arp_output.stdout[0] | parse_cli_textfsm(ntc_templates+'cisco_ios_show_ip_arp_vrf.textfsm') }}"
+
+- name: TEST 100 - Test reachability and latency to GPR (STH) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.15.64
+    vrf: "5"
+  register: ping_sth_gpr_b
+  ignore_errors: true
+
+- name: TEST 105 - Test reachability and latency to GPR (HKG) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.159.64
+    vrf: "5"
+  register: ping_hkg_gpr_b
+  ignore_errors: true
+
+- name: TEST 110 - Test reachability and latency to GPR (SEC) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.79.64
+    vrf: "5"
+  register: ping_sec_gpr_b
+  ignore_errors: true
+
+# Compare routing-table pre and post migration
+- name: PREP (4) - Download the post migration routing-table
+  ansible.builtin.command: python {{ playbook_dir }}/../src/snap/netverify.py --run post
+  run_once: true
+  ignore_errors: true
+
+# Compare routing-table pre and post migration
+- name: TEST 4 - Diff routingtables
+  ansible.builtin.command: python {{ playbook_dir }}/../src/snap/netverify.py --run diff
+  run_once: true
+  register: test4
+  ignore_errors: true
+
+# Change summary
+- ansible.builtin.set_fact:
+    sat_code: unsuccessful
+
+- name: testcase
+  ansible.builtin.set_fact:
+    sat_code: successful
+  when: test1.failed == false and test2.failed == false and test3.failed == false
+
+# and device_neighbors|length > 2 REMOVED FORM SAT TEST
+
+- name: Write Change notes
+  ansible.builtin.set_fact:
+    sat_note:
+      - playbook: "The Playbook was: {{ sat_code }}"
+      - test1: "Ping 8.8.8.8 from Guest Wifi: {{ 'successful' if not test1.failed else 'unsuccessful' }}"
+      - test2: "Ping 10.61.95.134 from lan: {{ 'successful' if not test2.failed else 'unsuccessful' }}"
+      - test2: "Ping 10.61.95.134 from mgmt: {{ 'successful' if not test3.failed else 'unsuccessful' }}"
+      - test3: "Pre-migration rtt to EMEA:{{ ping_sth_gpr_a.rtt }}"
+      - test3.1: "Post-migration rtt to EMEA:{{ ping_sth_gpr_b.rtt }}"
+      - test4: "Pre-migration rtt to APAC:{{ ping_hkg_gpr_a.rtt }}"
+      - test4.1: "Post-migration rtt to APAC:{{ ping_hkg_gpr_b.rtt }}"
+      - test5: "Pre-migration rtt to AMER:{{ ping_sec_gpr_a.rtt }}"
+      - test5.1: "Post-migration rtt to AMER:{{ ping_sec_gpr_b.rtt }}"
+      - test10: "Route diff: {{ test4.stderr_lines }}"

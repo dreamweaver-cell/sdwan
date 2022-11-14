@@ -1,0 +1,12 @@
+---
+- name: Notify teams on error
+  community.general.office_365_connector_card:
+    webhook: "{{ item }}"
+    text: "{{ lookup('template', templ | default('notify_mac.j2', True) ) }}"
+    color: "{{ color | default('00FF00') }}"
+  vars:
+    summary: "{{ inventory_hostname }} MAC address "
+  delegate_to: localhost
+  loop:
+    - "{{ devops_channel_dot1x }}"
+  ignore_errors: true

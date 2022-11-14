@@ -1,0 +1,38 @@
+---
+# vars file for snow_change
+snow_change_username: "API_netorch"
+sn_instance: "hmdev"
+sn_taks_nr: ""
+sn_change_nr: ""
+sn_short_description: "MIG-{{ inventory_hostname }}"
+sn_description: "The ctask has been created by NetDevOps SNAP automation"
+sn_justification: "This Change is pre-approved and managed by Global Connectivity team "
+sn_implementation_plan: "NetDevOps SNAP automation will preform pre and post test in case of issues alarms will be raised"
+sn_risk_impact_analysis: "This is a generic task and is considered to be low impact"
+sn_backout_plan: "Error messages will be sent to Global Connectivity NetDevOps channel"
+sn_test_plan: "Pre-, post- verification will be performed to verify functionality and service availability"
+sat_note: "No notes provided by Automation - Default Note"
+
+# When creatin a pre-approved change the below configuraitons are needed
+sn_assignment_group: "Infra Services - Network"
+sn_assigned_to: ""
+sn_business_service: "Core WAN - PROD"
+sn_service_offering: "Core WAN - PROD Automation - PROD_A S Off"
+sn_cmdb_ci: "Core WAN - PROD"
+sn_severity: 2
+sn_priority: 2
+sn_risk: 4
+
+# Do not modify
+# Change states
+SN_STATE: ""
+SN_CLOSE: "3"
+SN_NEW: "-5"
+SN_APPROVAL: "-4"
+SN_SCHEDULE: "-2"
+SN_IMPLEMENT: "-1"
+SN_REVIEW: "0"
+
+# Ctask states
+SN_CTASK_OPEN: "1"
+SN_CTASK_CLOSE: "0"

@@ -1,0 +1,97 @@
+{ "generalTemplates": [
+    {
+        "templateName": "PROD-EDGE-CLI-CONFIG-ZSCALER-IPSEC",
+        "templateType": "cli-template"
+    },
+    {
+        "templateName": "PROD-EDGE-VPN0-V2",
+        "templateType": "cisco_vpn",
+        "subTemplates": [
+          {
+            "templateName": "PROD-EDGE-IPSEC50",
+            "templateType": "cisco_vpn_interface_ipsec"
+          },
+          {
+            "templateName": "PROD-EDGE-IPSEC51",
+            "templateType": "cisco_vpn_interface_ipsec"
+          }
+        ]
+    },
+{% if "C1111" in part_number %}
+        {
+            "templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+            "templateType": "cisco_vpn",
+            "subTemplates": [
+                {
+                    "templateName": "PROD-VLAN12-SVI-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "vpn-interface-svi"
+                }
+            ]
+        },
+        {
+            "templateName": "PROD-EDGE-GUEST-VPN900-IPSEC",
+            "templateType": "cisco_vpn",
+            "subTemplates": [
+                {
+                    "templateName": "PROD-VLAN927-SVI-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "vpn-interface-svi",
+                    "subTemplates": [
+                        {
+                            "templateName": "VLAN927-DHCP-POOL",
+                            "templateType": "cisco_dhcp_server"
+                        }
+                    ]
+                },
+                {
+                    "templateName": "PROD-VLAN928-SVI-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "vpn-interface-svi",
+                    "subTemplates": [
+                        {
+                            "templateName": "VLAN928-DHCP-POOL",
+                            "templateType": "cisco_dhcp_server"
+                        }
+                    ]
+                }
+            ]
+        }
+    {% endif %}
+    {% if "ISR4" in part_number %}
+        {
+            "templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+            "templateType": "cisco_vpn",
+            "subTemplates": [{% if not services.office_ds_switch_ospfv3 %}
+                {
+                    "templateName": "PROD-VLAN12-SUBINT-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "cisco_vpn_interface"
+                }
+            {% endif %}]
+        }
+        ,{
+            "templateName": "PROD-EDGE-GUEST-VPN900-IPSEC",
+            "templateType": "cisco_vpn",
+            "subTemplates": [
+                {
+                    "templateName": "PROD-VLAN927-SUBINT-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "cisco_vpn_interface",
+                    "subTemplates": [
+                        {
+                            "templateName": "VLAN927-DHCP-POOL",
+                            "templateType": "cisco_dhcp_server"
+                        }
+                    ]
+                },
+                {
+                    "templateName": "PROD-VLAN928-SUBINT-VRRP-{{redundant_router_type|upper}}",
+                    "templateType": "cisco_vpn_interface",
+                    "subTemplates": [
+                        {
+                            "templateName": "VLAN928-DHCP-POOL",
+                            "templateType": "cisco_dhcp_server"
+                        }
+                    ]
+                }
+            ]
+        }
+    {% endif %}
+    ]
+}

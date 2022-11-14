@@ -1,0 +1,15 @@
+{% if redundant_router_type == "pri" %}
+    {% set ospf_cost = "10" %}
+    {% set lan_interface = services.lan.interfaces[0].split(".")[0] %}
+{% endif %}
+{% if redundant_router_type == "sec" %}
+    {% set ospf_cost = "100" %}
+    {% set lan_interface = services.lan.interfaces[0].split(".")[0] %}
+{% endif %}
+{
+    "ospf_lan_interface": "{{ lan_interface }}",
+    "ospf_client_interface": "{{ lan_interface }}",
+    "ospf_lan_cost": "{{ ospf_cost }}",
+    "ospf_client_cost": "{{ ospf_cost }}",
+    "ospf_originate_metric": "{{ ospf_cost }}"
+}

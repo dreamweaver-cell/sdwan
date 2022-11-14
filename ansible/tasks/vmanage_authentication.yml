@@ -1,0 +1,22 @@
+- name: Get set_cookie from Vmanage
+  uri:
+    url: "https://{{ vmanage_host }}:443/j_security_check"
+    method: POST
+    validate_certs: false
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body: "j_username={{ vmanage_user }}&j_password={{ vmanage_password }}"
+  register: vauth
+
+- name: Authenticate get Token
+  uri:
+    return_content: yes
+    url: "https://{{ vmanage_host }}:443/dataservice/client/token"
+    method: GET
+    validate_certs: false
+    body_format: json
+    headers:
+      Content-Type: "application/json"
+      Cookie: "{{ vauth.cookies_string }}"
+  register: token
+  tags: get_token

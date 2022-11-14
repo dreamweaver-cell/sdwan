@@ -1,0 +1,13 @@
+---
+- name: Notify teams
+  community.general.office_365_connector_card:
+    webhook: "{{ item }}"
+    summary: "{{ inventory_hostname }} {{ message }}" 
+    # title: "{{ inventory_hostname }}" 
+    text: "{{ lookup('template', templ | default('notify.j2', True) ) }}"
+    color: "{{ color | default('') }}"
+  vars:
+    message: "{{ msg | default('no message') }}"
+  delegate_to: localhost
+  loop: "{{ hooks }}"
+  ignore_errors: true

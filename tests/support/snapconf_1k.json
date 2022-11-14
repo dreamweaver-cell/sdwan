@@ -1,0 +1,183 @@
+{
+    "version": "v1.1",
+    "device_name": "sesthit8rtr001",
+    "part_number": "C1111-8PWE",
+    "device_serial_number": "FGL22441544",
+    "serial_number_in_hex": "01726D9B",
+    "vpn0_next_hop_ip_address": "185.212.21.49",
+    "system_longitude": "-1.895975",
+    "system_latitude": "52.478877",
+    "routing": {
+        "static": [
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel50",
+                "nexthop_ip": "172.18.67.2"
+            },
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel51",
+                "nexthop_ip": "172.18.67.6"
+            },
+            {
+                "vrf": "vpn0",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "GigabitEthernet0/0/0",
+                "nexthop_ip": "185.212.21.49"
+            }
+        ]
+    },
+    "services": {
+        "internet": {
+            "interfaces": [
+                "GigabitEthernet0/0/0"
+            ],
+            "enabled": true
+        },
+        "lan": {
+            "interfaces": [
+                "Vlan927",
+                "Vlan928",
+                "Vlan2",
+                "Vlan5",
+                "Vlan12",
+                "Vlan100"
+            ],
+            "enabled": true
+        },
+        "zscaler": {
+            "interfaces": [
+                "Tunnel50",
+                "Tunnel51"
+            ],
+            "enabled": true
+        },
+        "mgmt": {
+            "interfaces": [
+                "Loopback5"
+            ],
+            "enabled": true
+        }
+    },
+    "interfaces": {
+        "GigabitEthernet0/0/0": {
+            "description": "** INTERNET INTERFACE INTERNET-A | PROVIDER: WOJO | CIRCUIT-ID: WOJO-POB-SW13-R5 port 1 & WOJO-POB-SW14-R5 port 1",
+            "bandwidth": 30000,
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps",
+            "vrf": "vpn0",
+            "inbound_access_list": "ANTISPOOF-iACL-IN-IPv4",
+            "outbound_access_list": "ANTISPOOF-iACL-OUT-IPv4",
+            "mtu": 1500,
+            "ipv4": "185.212.21.50/29"
+        },
+        "GigabitEthernet0/1/0": {
+            "description": "** Switch trunk",
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "port_speed": "1000mb/s",
+            "accessport": "trunk",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "Vlan2": {
+            "description": " * office LAN * ",
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126"
+            ],
+            "vrf": "vpn10",
+            "ipv4": "10.188.234.130/29",
+            "standby": "10.188.234.129"
+        },
+        "Vlan5": {
+            "description": "mgmt LAN",
+            "bandwidth": 1000000,
+            "vrf": "vpn5",
+            "ipv4": "10.20.16.66/29",
+            "standby": "10.20.16.65"
+        },
+        "Vlan12": {
+            "description": " office LIB/LAN ",
+            "bandwidth": 1000000,
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126"
+            ],
+            "vrf": "vpn12",
+            "ipv4": "10.188.233.2/24",
+            "standby": "10.188.233.1"
+        },
+        "Vlan100": {
+            "description": "Voice LAN",
+            "bandwidth": 1000000,
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.188.234.138/29",
+            "standby": "10.188.234.137"
+        },
+        "Vlan927": {
+            "description": "**LIB_HM_WIFI_GUEST**",
+            "bandwidth": 1000000,
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "ipv4": "172.16.0.2/22",
+            "standby": "172.16.0.1"
+        },
+        "Vlan928": {
+            "description": "**LIB_HM_WIFI_ACCESS**",
+            "bandwidth": 1000000,
+            "phys_address": "700f.6a98.e572",
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "ipv4": "172.16.8.2/21",
+            "standby": "172.16.8.1"
+        },
+        "Loopback5": {
+            "description": "** MANAGEMENT INTERFACE",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1514,
+            "ipv4": "10.20.28.16/32"
+        },
+        "Tunnel50": {
+            "bandwidth": 30000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.18.67.1/30",
+            "destination": "147.161.178.193",
+            "source": "GigabitEthernet0/0/0"
+        },
+        "Tunnel51": {
+            "bandwidth": 30000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.18.67.5/30",
+            "destination": "165.225.76.36",
+            "source": "GigabitEthernet0/0/0"
+        }
+    },
+    "redundant_router_type": "pri"
+}

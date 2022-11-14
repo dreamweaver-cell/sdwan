@@ -1,0 +1,5 @@
+Value VERSION (\S*)
+
+Start
+  ^.*Version\s+${VERSION},\s+RELEASE -> Record
+

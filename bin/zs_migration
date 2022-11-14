@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+light_red='\e[1;91m%s\e[0m\n'
+light_green='\e[1;92m%s\e[0m\n'
+
+if [ -z "$1" ]
+then
+  echo "MUST GIVE HOSTNAME and CHANGE_VARS AS ARGUMENT"
+  exit 1
+fi
+HOSTNAME=$1
+
+ping -c 1 -q "${HOSTNAME}"
+if [ "$?" -eq 0 ]; then
+  printf "$light_green" "[ CONNECTION AVAILABLE ]"
+else
+  printf "$light_red" "[ HOST DISCONNECTED ]"
+  exit 0
+fi
+
+ANSIBLE_DIR=${ANSIBLE_INVENTORY}/../
+
+echo "----- Changeing to IPSEC in snapconfig -----"
+sed -i 's/\"zscaler\"/\"zscaler_ipsec\"/' ${SNAPCONF_DIR}/${HOSTNAME}.json
+
+snap "${HOSTNAME}"
+ansible-playbook --limit "${HOSTNAME}" --tags zs_migrate,all ${ANSIBLE_DIR}/provision.yml || { echo "ERROR: reprovisioning failed for ${HOSTNAME}" ; exit 1; }

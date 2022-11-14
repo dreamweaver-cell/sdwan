@@ -1,0 +1,29 @@
+---
+
+ - name: check limit is set
+   ansible.builtin.fail:
+     msg: "you must use -l or --limit"
+   when: ansible_limit is not defined
+   run_once: true
+
+ - name: "TASK 1: GET CONNECTED IP"
+   cisco.ios.ios_command:
+     commands:
+       - show ip route vrf 10 summary
+       - show ip route vrf 12 summary
+     wait_for:
+       - result[0] contains VRF 10
+       - result[1] contains VRF 12
+   register: ip_summary
+
+ - name: "TASK 2: REGISTER OUTPUT TO routes_vrf_10 VARIABLE"
+   ansible.builtin.set_fact:
+     routes_vrf_10: "{{ ip_summary.stdout[0] | parse_cli_textfsm(ntc_templates+'cisco_ios_show_ip_route_summary.textfsm') }}"
+     routes_vrf_12: "{{ ip_summary.stdout[1] | parse_cli_textfsm(ntc_templates+'cisco_ios_show_ip_route_summary.textfsm') }}"
+   tags: untagged
+
+ - name: "TASK 2.1: REGISTER OUTPUT TO post_routes_vrf_10 VARIABLE"
+   ansible.builtin.set_fact:
+     post_routes_vrf_10: "{{ ip_summary.stdout[0] | parse_cli_textfsm(ntc_templates+'cisco_ios_show_ip_route_summary.textfsm') }}"
+     post_routes_vrf_12: "{{ ip_summary.stdout[1] | parse_cli_textfsm(ntc_templates+'cisco_ios_show_ip_route_summary.textfsm') }}"
+   tags: post

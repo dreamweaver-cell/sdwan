@@ -1,0 +1,22 @@
+{# Provisioning template ospfv3 router  v1.0 #}
+
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-LAN-VPN10-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+				"templateName": "PROD-EDGE-LAN-OSPF",
+     			"templateType": "cisco_ospfv3"
+			}
+		]
+	},
+	{
+		"templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+				"templateName": "PROD-EDGE-CLIENT-OSPF",
+     			"templateType": "cisco_ospfv3"
+			}
+		]
+	}]
+}

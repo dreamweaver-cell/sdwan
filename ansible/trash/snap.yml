@@ -1,0 +1,13 @@
+---
+# Ansible Playbook to start auto provisioning of network devices
+
+- name: Playbook - SNAP - Auto provisioning
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: Start snap device creation
+      ansible.builtin.command: snap {{ inventory_hostname }}
+      run_once: true

@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% load static %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h4>UPLOAD CONFIGURATION FILE</h4>
+<p>Upload a SNAP-configuration file. Make sure it is in a valid SNAP-format.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        {% bootstrap_button button_type="submit" content="Upload" %}
+    </form>
+
+{% endblock %}

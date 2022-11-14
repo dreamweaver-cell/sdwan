@@ -1,0 +1,6 @@
+Value PORT (\d{1}\/\d{1}\/\d{1})
+Value ADMIN_STATE (\S*)
+Value VOICE_TYPE (\S*)
+
+Start
+  ^${PORT}\s*[1-9]\s+${VOICE_TYPE}\s+${ADMIN_STATE} -> Record

@@ -1,0 +1,359 @@
+{
+    "version": "2.0",
+    "device_name": "atgraao1rtr001",
+    "part_number": "C1111-8PWE",
+    "software_version": "17.3.4a",
+    "device_serial_number": "FGL23189180",
+    "crypto_sn": "FGL23189180",
+    "routing": {
+        "static": [
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel50",
+                "nexthop_ip": "172.20.93.170"
+            },
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel51",
+                "nexthop_ip": "172.20.93.174"
+            },
+            {
+                "vrf": "vpn900",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel55",
+                "nexthop_ip": "172.20.214.74"
+            },
+            {
+                "vrf": "vpn900",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel56",
+                "nexthop_ip": "172.20.214.78"
+            },
+            {
+                "vrf": "vpn0",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "GigabitEthernet0/0/1",
+                "nexthop_ip": "80.120.210.225"
+            }
+        ]
+    },
+    "redundant_router_type": "pri",
+    "services": {
+        "internet": {
+            "interfaces": [
+                "GigabitEthernet0/0/1"
+            ],
+            "enabled": true
+        },
+        "mgmt": {
+            "interfaces": [
+                "Loopback5"
+            ],
+            "enabled": true
+        },
+        "zscaler": {
+            "interfaces": [
+                "Tunnel50",
+                "Tunnel51"
+            ],
+            "enabled": true
+        },
+        "guestwifi": {
+            "interfaces": [
+                "Tunnel55",
+                "Tunnel56"
+            ],
+            "enabled": true
+        },
+        "lan": {
+            "interfaces": [
+                "Vlan2",
+                "Vlan5",
+                "Vlan12",
+                "Vlan927",
+                "Vlan928"
+            ],
+            "enabled": true
+        }
+    },
+    "interfaces": {
+        "GigabitEthernet0/0/0": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true
+        },
+        "GigabitEthernet0/0/1": {
+            "description": "** INTERNET INTERFACE INTERNET-A | PROVIDER: A1 Telekom Austria AG | CIRCUIT-ID: 916691796 | BW: 30 Mbps",
+            "bandwidth": 30000,
+            "auto_negotiate": false,
+            "vrf": "vpn0",
+            "mtu": 1500,
+            "ipv4": "80.120.210.226/29"
+        },
+        "GigabitEthernet0/1/0": {
+            "description": "*** LAN",
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "trunk",
+            "vlan": "1",
+            "voice_vlan": "",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/1": {
+            "description": "*** LAN",
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "trunk",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/2": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/3": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/4": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/5": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/6": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "GigabitEthernet0/1/7": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "accessport": "dynamic auto",
+            "vlan": "1",
+            "voice_vlan": "none",
+            "native_vlan": "1"
+        },
+        "Wlan-GigabitEthernet0/1/8": {
+            "description": "Internal switch interface connecting to the embedded AP",
+            "bandwidth": 1000000,
+            "auto_negotiate": true
+        },
+        "Loopback5": {
+            "description": "** MANAGEMENT INTERFACE",
+            "bandwidth": 8000000,
+            "vrf": "vpn5",
+            "mtu": 1514,
+            "ipv4": "10.20.15.180/32"
+        },
+        "Tunnel10": {
+            "description": "** REGIONAL DMVPN (STH)",
+            "bandwidth": 30000,
+            "mtu": 1400,
+            "ipv4": "10.0.4.183/23"
+        },
+        "Tunnel50": {
+            "bandwidth": 30000,
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.20.93.169/30",
+            "destination": "165.225.200.35",
+            "source": "GigabitEthernet0/0/1"
+        },
+        "Tunnel51": {
+            "bandwidth": 30000,
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.20.93.173/30",
+            "destination": "165.225.94.42",
+            "source": "GigabitEthernet0/0/1"
+        },
+        "Tunnel55": {
+            "bandwidth": 30000,
+            "vrf": "vpn900",
+            "mtu": 1476,
+            "ipv4": "172.20.214.73/30"
+        },
+        "Tunnel56": {
+            "bandwidth": 30000,
+            "vrf": "vpn900",
+            "mtu": 1476,
+            "ipv4": "172.20.214.77/30"
+        },
+        "Vlan2": {
+            "description": "** VRF LAN: LAN ADDRESS",
+            "bandwidth": 1000000,
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126",
+                "10.60.15.212",
+                "10.64.15.211"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.50.13.2/24",
+            "standby": "10.50.13.1"
+        },
+        "Vlan5": {
+            "description": "** VRF MGMT: INFRASTRUCTURE MANGEMENT",
+            "bandwidth": 1000000,
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "10.20.4.234/29",
+            "standby": "10.20.4.233"
+        },
+        "Vlan12": {
+            "description": "** VRF LAN: LAN ADDRESS",
+            "bandwidth": 1000000,
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126",
+                "10.60.15.212",
+                "10.64.15.211"
+            ],
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "10.188.187.162/27",
+            "standby": "10.188.187.161"
+        },
+        "Vlan927": {
+            "description": "**LIB_HM_WIFI_GUEST**",
+            "bandwidth": 1000000,
+            "vrf": "vpn900",
+            "mtu": 1500,
+            "ipv4": "172.16.0.2/22",
+            "standby": "172.16.0.1"
+        },
+        "Vlan928": {
+            "description": "**LIB_HM_WIFI_ACCESS**",
+            "bandwidth": 1000000,
+            "vrf": "vpn900",
+            "mtu": 1500,
+            "ipv4": "172.16.8.2/21",
+            "standby": "172.16.8.1"
+        }
+    },
+    "wlan_if_shutdown": "true",
+    "system_longitude": "15.437706",
+    "system_latitude": "47.071830",
+    "system_ip": "10.20.15.180",
+    "site_id": "10430401",
+    "vlan5_pri_ipv4_address": "",
+    "vlan5_dhcp_helper": "",
+    "vlan5_vrrp_ipaddress": "",
+    "lo5_ipv4_address": "",
+    "vpn10_ipv4_route_1": "",
+    "vpn10_ipv4_route_2": "",
+    "vpn10_ipv4_route_3": "",
+    "vpn10_ipv4_route_4": "",
+    "vpn10_ipv4_route_5": "",
+    "vpn10_next_hop_ip_1": "",
+    "vpn10_next_hop_ip_2": "",
+    "vpn10_next_hop_ip_3": "",
+    "vpn10_next_hop_ip_4": "",
+    "vpn10_next_hop_ip_5": "",
+    "vpn10_next_hop_ip_distance_1": "",
+    "vpn10_next_hop_ip_distance_2": "",
+    "vpn10_next_hop_ip_distance_3": "",
+    "vpn10_next_hop_ip_distance_4": "",
+    "vpn10_next_hop_ip_distance_5": "",
+    "vpn10_static_tracker_name": "",
+    "vlan100_pri_ipv4_address": "",
+    "vlan100_dhcp_helper": "",
+    "vlan100_vrrp_ipaddress": "",
+    "vlan11_pri_ipv4_address": "",
+    "vlan11_dhcp_helper": "",
+    "vlan11_vrrp_ipaddress": "",
+    "vlan12_pri_ipv4_address": "",
+    "vlan12_dhcp_helper": "",
+    "vlan12_vrrp_ipaddress": "",
+    "vlan2_pri_ipv4_address": "",
+    "vlan2_dhcp_helper": "",
+    "vlan2_vrrp_ipaddress": "",
+    "dns_primary": "",
+    "dns_secondary": "",
+    "default_prefix": "",
+    "default2_prefix": "",
+    "default3_prefix": "",
+    "default4_prefix": "",
+    "default5_prefix": "",
+    "vpn0_next_hop_ip_address": "",
+    "vpn0_next_hop_ip_address2": "",
+    "vpn0_next_hop_ip_address3": "",
+    "vpn0_next_hop_ip_address4": "",
+    "vpn0_next_hop_ip_address5": "",
+    "ipsec_tunnel51_ip_address": "",
+    "ipsec_tunnel51_source_interface": "",
+    "ipsec_tunnel51_destination_ip": "",
+    "ipsec_tunnel51_pre_shared_secret": "",
+    "ipsec_tunnel51_pre_shared_secret": "",
+    "ipsec_tunnel51_username": "",
+    "ipsec_tunnel51_remote_id": "",
+    "ipsec_tunnel50_ip_address": "",
+    "ipsec_tunnel50_source_interface": "",
+    "ipsec_tunnel50_destination_ip": "",
+    "ipsec_tunnel50_pre_shared_secret": "",
+    "ipsec_tunnel50_username": "",
+    "ipsec_tunnel50_remote_id": "",
+    "internet_if_name": "",
+    "internet_if_description": "",
+    "internet_if_ipv4_address": "",
+    "internet_shaping_rate": "",
+    "access_if_1": "",
+    "access_if_2": "",
+    "trunk_if_1": "",
+    "access_if_3": "",
+    "access_if_5": "",
+    "access_if_6": "",
+    "access_if_7": "",
+    "wlan_int": "",
+    "access_if_4": "",
+    "access_if_8": "",
+    "trunk_if_2": "",
+    "access_if_1_vlan": "",
+    "access_if_2_vlan": "",
+    "access_if_3_vlan": "",
+    "access_if_5_vlan": "",
+    "access_if_6_vlan": "",
+    "access_if_7_vlan": "",
+    "access_if_4_vlan": "",
+    "access_if_8_vlan": "",
+    "trunk_if_1_allowed_vlans": "",
+    "trunk_if_2_allowed_vlans": "",
+    "trunk_if_1_native_vlan": "",
+    "trunk_if_2_native_vlan": "",
+    "snmp_device_location": "",
+    "system_host_name": "",
+    "system_system_ip": "",
+    "system_site_id": "",
+    "vpn10_static_tracker_endpoint_ip": "",
+    "tracker_threshold": ""
+}

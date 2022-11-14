@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+light_red='\e[1;91m%s\e[0m\n'
+light_green='\e[1;92m%s\e[0m\n'
+
+if [ -z "$1" ]
+then
+  printf "$light_red" "MUST GIVE PLAYBOOKNAME AS FIRST ARGUMENT"
+  exit 1
+fi
+
+if [ ! -z "$2" ]
+then
+  LIMIT="--limit ${2}"
+fi
+
+PLAYBOOK=$1
+HOSTNAME=$2
+ANSIBLE_DIR=${ANSIBLE_INVENTORY}/../
+CURRENT=$PWD
+cd ${ANSIBLE_DIR}
+
+ansible-playbook -i ${ANSIBLE_INVENTORY} ${LIMIT} ${PLAYBOOK}
+cd ${CURRENT}

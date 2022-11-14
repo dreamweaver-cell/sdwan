@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#
+# Schedules a migration change run like:
+# schedule_migration_change selabdc1rtr001 2022-11-05 08:00:00
+# 
+
+light_red='\e[1;91m%s\e[0m\n'
+
+if [ -z "$1" ]
+then
+  printf "$light_red" "MUST GIVE HOSTNAME AS FIRST ARGUMENT"
+  exit 1
+fi
+
+LIMIT="--limit ${1}"
+
+HOSTNAME=$2
+START_DATE=$3
+START_TIME=$4
+ANSIBLE_DIR=${ANSIBLE_INVENTORY}/../
+CURRENT=$PWD
+cd ${ANSIBLE_DIR}
+
+ansible-playbook -i ${ANSIBLE_INVENTORY} ${LIMIT} create_migration_change.yml -e "start='${START_DATE} ${START_TIME}'"
+
+cd ${CURRENT}

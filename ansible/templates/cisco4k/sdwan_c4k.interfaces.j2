@@ -1,0 +1,176 @@
+    "interfaces": {
+        {% if "internet" in router.services %}
+        "{{ internet_interface }}": {
+            "description": "** INTERNET INTERFACE INTERNET-A | PROVIDER: {{ router.services.internet.internet_provider }} | CIRCUIT-ID: {{ router.services.internet.internet_circuit_id }}",
+            "bandwidth": {{ router.services.internet.bandwidth }},
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps",
+            "vrf": "vpn0",
+            "inbound_access_list": "ANTISPOOF-iACL-IN-IPv4",
+            "outbound_access_list": "ANTISPOOF-iACL-OUT-IPv4",
+            "mtu": 1500,
+            "ipv4": "{{ router.services.internet.ipv4 }}"
+        },
+        {%- endif %}
+
+        "{{ lan_interface }}": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps"
+        },
+        {%- for vlan_id in router.services.lan %}
+        {%- if vlan_id.vlan  == "2" -%}
+        "{{ lan_interface }}.2": {
+            "description": " * office LAN * ",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "{{ regional_dhcp_helper.split(",")[0] }}",
+                "{{ regional_dhcp_helper.split(",")[1] }}"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "{{vlan_id.ipv4 | ipaddr('net') | ipaddr('2') }}",
+            "standby": "{{vlan_id.ipv4| ipaddr('net') | ipaddr('1') | ipv4('address') }}"
+        },
+        {%- endif %}
+        {%- endfor %}
+        {%- for vlan_id in router.services.lan %}
+        {%- if vlan_id.vlan  == "5" -%}
+        "{{ lan_interface }}.5": {
+            "description": "mgmt LAN",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "{{vlan_id.ipv4 | ipaddr('net') | ipaddr('2') }}",
+            "standby": "{{vlan_id.ipv4| ipaddr('net') | ipaddr('1') | ipv4('address') }}"
+        },
+        {%- endif %}
+        {%- endfor %}
+        {%- for vlan_id in router.services.lan %}
+        {%- if vlan_id.vlan  == "12" -%}
+        "{{ lan_interface }}.12": {
+            "description": " office LIB/LAN ",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "{{ regional_dhcp_helper.split(",")[0] }}",
+                "{{ regional_dhcp_helper.split(",")[1] }}"
+            ],
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "{{vlan_id.ipv4 | ipaddr('net') | ipaddr('2') }}",
+            "standby": "{{vlan_id.ipv4| ipaddr('net') | ipaddr('1') | ipv4('address') }}"
+        },
+        {%- endif %}
+        {%- endfor %}
+        {%- for vlan_id in router.services.lan %}
+        {%- if vlan_id.vlan  == "100" -%}
+        "{{ lan_interface }}.100": {
+            "description": "Voice LAN",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "{{ regional_dhcp_helper.split(",")[0] }}",
+                "{{ regional_dhcp_helper.split(",")[1] }}"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "{{vlan_id.ipv4 | ipaddr('net') | ipaddr('2') }}",
+            "standby": "{{vlan_id.ipv4| ipaddr('net') | ipaddr('1') | ipv4('address') }}"
+        },
+        {%- endif %}
+        {%- endfor %}
+        "{{ lan_interface }}.927": {
+            "description": "**LIB_HM_WIFI_GUEST**",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "mtu": 1500,
+            "ipv4": "172.16.0.2/22",
+            "standby": "172.16.0.1"
+        },
+        "{{ lan_interface }}.928": {
+            "description": "**LIB_HM_WIFI_ACCESS**",
+            "bandwidth": 1000000,
+            "phys_address": "700f.6a98.e572",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "mtu": 1500,
+            "ipv4": "172.16.8.2/21",
+            "standby": "172.16.8.1"
+        },
+        {% if "4431" in router.services %}
+        "{{ interconnect_interface }}": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps"
+        },
+        {% endif %}
+        "GigabitEthernet0": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "auto speed"
+        },
+        "Loopback5": {
+            "description": "** MANAGEMENT INTERFACE",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1514,
+            "ipv4": "{{router.services.mgmt.ipv4 }}",
+        }
+        {% if "zcaler" in router.services %}
+        ,
+        "Tunnel50": {
+            "bandwidth": {{ router.services.internet.bandwidth }},
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "{{ router.services.zscaler.primary_tunnel.ipv4 | ipaddr('net') | ipaddr('1') }}",
+            "destination": "{{router.services.zscaler.primary_tunnel.ipv4_public_destination}}",
+            "source": "{{ internet_interface }}"
+        },
+        "Tunnel51": {
+            "bandwidth": {{ router.services.internet.bandwidth }},
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "{{router.services.zscaler.secondary_tunnel.ipv4 | ipaddr('net') | ipaddr('1')}}",
+            "destination": "{{router.services.zscaler.secondary_tunnel.ipv4_public_destination}}",
+            "source": "{{ internet_interface }}"
+        }
+        {% endif %}
+    },

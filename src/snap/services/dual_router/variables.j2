@@ -1,0 +1,21 @@
+ {
+     {% if services.dual_router.service_interconnect_tloc_destination %}
+        "inet_tloc_ext_dest_if_name": "{{ services.interconnect.interfaces[0].split(".")[0] }}",
+         {% if services.internet is not defined %}
+               "default_prefix": "0.0.0.0/0",
+               "vpn0_next_hop_ip_address": "192.0.2.1",
+         {% endif %}
+         {% if redundant_router_type == "pri" %}
+               "default2_prefix": "0.0.0.0/0",
+               "vpn0_next_hop_ip_address2": "192.0.2.1",
+         {% endif %}
+     {% endif%}
+     {% if services.dual_router.service_interconnect_tloc_source %}
+        "inet_tloc_ext_source_if_name": "{{ services.interconnect.interfaces[0].split(".")[0] }}",
+        "inet_if_tloc_extension": "{{ services.internet.interfaces[0] }}",
+     {% endif%}
+     
+     "tloc_ext_shaping_rate": "{{ services.dual_router.internet_source_bw }}"
+
+
+ }

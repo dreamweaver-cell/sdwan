@@ -1,0 +1,10 @@
+---
+# tasks file for snap-log
+- name: append new line EOF if doesn't exist
+  lineinfile:
+    path: "{{ FAIL_LOG_PATH }}{{ FAIL_LOG_LOGFILE }}"
+    line: 'LOG::{{ SEVERITY|upper }}::{{date_output.stdout}} {{inventory_hostname}} {{ansible_play_name}} {{lookup("file", "/proc/self/cmdline") | regex_search("\w+\Wyml")}}'
+    state: present
+    create: 
+    insertafter: EOF
+  delegate_to: localhost

@@ -1,0 +1,64 @@
+---
+- name: Update SDWAN parameters
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: check limit is set
+      ansible.builtin.fail:
+        msg: "you must use -l or --limit"
+      when: ansible_limit is not defined
+      run_once: true
+
+    - name: check if tags are set
+      ansible.builtin.fail:
+        msg: "you must use -t or --tags  set tags to [add_change,detach,push,attach] depending on usecase"
+      tags: not
+
+    # Start Pre-approved change
+    - name: Create Change Request
+      ansible.builtin.import_role:
+        name: snow_change
+      vars:
+        network_change: create
+        sn_short_description: "SNAP configuration update {{ inventory_hostname }}"
+        sn_description: "This is a task has been created by SNAP"
+        sn_justification: "This Update is authorized and maintained by Global Connectivity team "
+        sn_implementation_plan: "SNAP will gather facts about the site and configure the SDWAN router according to templates"
+        sn_risk_impact_analysis: "This update has no downtime"
+        sn_backout_plan: "Error messages will be sent to Global Connectivity DevOps channel, if error occures that will be handeld by GC"
+        sn_test_plan: "SAT tests will be executed by the provisioning scripts"
+      tags: add_change
+
+    # Start Change ( default change window 1h )
+    - name: Initiate vManage role
+      ansible.builtin.import_role:
+        name: network_vmanage
+      vars:
+        template_file: "{{ inventory_hostname }}.json"
+      ignore_errors: true
+
+    # Start SAT tests
+    - ansible.builtin.import_tasks: ios_sat_test.yml
+      ignore_errors: true
+
+    - ansible.builtin.set_fact:
+        msg: "Update Completed witout errors"
+        color: "00EE00"
+      when: sat_code == "successful"
+
+    - ansible.builtin.set_fact:
+        msg: "Update ended with errors"
+        color: "EE0000"
+      when: sat_code == "unsuccessful"
+
+    # Close Pre-approved Change
+    - name: Close Change Request
+      ansible.builtin.import_role:
+        name: snow_change
+      vars:
+        network_change: close
+        sat_note: "Template update {{ sat_code }} installed"
+        sat_code: "{{ sat_code }}"
+      tags: add_change

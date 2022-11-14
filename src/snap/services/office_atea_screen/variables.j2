@@ -1,0 +1,24 @@
+{
+    {% if "C1111" in part_number %}
+         {% for vlan_interface in services.office_atea_screen.interfaces %}
+              "{{ vlan_interface|lower }}_sub_if_name" : "{{ vlan_interface|lower }}",
+              "{{ vlan_interface|lower }}_sub_if_description" : "** Atea screen",
+              "{{ vlan_interface|lower }}_{{ redundant_router_type }}_ipv4_address" : "{{ interfaces.get(vlan_interface).ipv4 }}",
+              "{{ vlan_interface|lower }}_vrrp_ipaddress" : "{{ interfaces.get(vlan_interface).standby }}",
+              "{{ vlan_interface|lower }}_dhcp_helper" : "{{ interfaces.get(vlan_interface).helper_address | join(',') | default(regional_dhcp_helper, true) }}" {{ "," if not loop.last }}
+         {% endfor %}
+    {% endif %}
+
+    {% if "ISR4" in part_number %}
+         {% set vlanid = "" %}
+         {% for subinterface in services.office_atea_screen.interfaces %}
+            {% set vlanid = subinterface.split(".") %}
+            "vlan{{ vlanid[1] }}_sub_if_name" : "{{ subinterface }}",
+            "vlan{{ vlanid[1] }}_sub_if_description" : "** Atea screen",
+            "vlan{{ vlanid[1] }}_{{ redundant_router_type }}_ipv4_address" : "{{ interfaces.get(subinterface).ipv4 }}",
+            "vlan{{ vlanid[1] }}_vrrp_ipaddress" : "{{ interfaces.get(subinterface).standby }}",
+            "vlan{{ vlanid[1] }}_dhcp_helper" : "{{ interfaces.get(subinterface).helper_address | join(',') | default(regional_dhcp_helper, true) }}",
+         {% endfor %}
+         "parent_lan_if_name": "{{ services.lan.interfaces[0].split(".")[0] }}"
+    {% endif %}
+}

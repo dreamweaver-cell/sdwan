@@ -1,0 +1,26 @@
+<h2><b>{{ inventory_hostname }}</b></h2>
+{{ now(fmt="%Y-%m-%d %H:%M:%S") }} {{ inventory_hostname }}: <b>{{ message }}</b>
+{% if sn_change is defined and sn_change.record['number'] %}
+    <p> changenr: <a href="https://{{ sn_instance }}.service-now.com/nav_to.do?uri=change_request.do?sysparm_query=number={{ sn_change.record['number'] }}">{{ sn_change.record['number'] }} </a></p>
+{% endif %}
+
+<table style="width:100%">
+    <tr>
+        <th>popsite</th><th>RTT pre</th><th>RTT post</th>
+    </tr>
+    <tr><td>INET</td><td>{{ pre_internet_test['rtt']['avg'] | default('-', True) }}ms</td><td>{{ test1['rtt']['avg'] | default('-', True) }}ms</td></tr>
+    <tr><td>sth</td><td>{{ ping_sth_gpr_a['rtt']['avg'] | default('-', True) }}ms</td><td>{{ ping_sth_gpr_b['rtt']['avg'] | default('-', True) }}ms</td></tr>
+    <tr><td>hkg</td><td>{{ ping_hkg_gpr_a['rtt']['avg'] | default('-', True) }}ms</td><td>{{ ping_hkg_gpr_b['rtt']['avg'] | default('-', True) }}ms</td></tr>
+    <tr><td>sec</td><td>{{ ping_sec_gpr_a['rtt']['avg'] | default('-', True) }}ms</td><td>{{ ping_sec_gpr_b['rtt']['avg'] | default('-', True) }}ms</td></tr>
+</table>
+
+{% if table is defined and table %}
+<hr>
+<table style="width:100%">
+    {% for key, value in table.items() %}
+    <tr>
+        <td>{{ key }}</td><td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

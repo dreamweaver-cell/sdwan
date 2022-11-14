@@ -1,0 +1,230 @@
+{
+    "_comment": "THIS FILE IS USED BY PYTEST TO VERIFY DUAL ROUTER TLOC EXTENSION",
+    "version": "2.1",
+    "device_name": "snapconfig_dual_router_2_vpls+ineternet",
+    "part_number": "ISR4451-X/K9",
+    "device_serial_number": "FOC21021F0F",
+    "routing": {
+        "static": [
+            {
+                "vrf": "vpn0",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "GigabitEthernet0/0/1.133",
+                "nexthop_ip": "10.0.128.3"
+            },
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel50",
+                "nexthop_ip": "172.17.206.218"
+            },
+            {
+                "vrf": "vpn12",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "Tunnel51",
+                "nexthop_ip": "172.17.206.222"
+            },
+            {
+                "vrf": "INTERNET_A",
+                "ipv4": "0.0.0.0",
+                "ipv4_mask": "0.0.0.0",
+                "nexthop_if": "GigabitEthernet0/0/2",
+                "nexthop_ip": "58.40.147.117"
+            }
+        ]
+    },
+    "redundant_router_type": "sec",
+    "services": {
+        "lan": {
+            "interfaces": [
+                "GigabitEthernet0/0/0.5"
+            ],
+            "enabled": true
+        },
+        "office_ds_switch_ospfv3": {
+            "interfaces": [
+                "GigabitEthernet0/0/0.3902",
+                "GigabitEthernet0/0/0.3908"
+            ],
+            "enabled": true
+        },
+        "vpls": {
+            "interfaces": [
+                "GigabitEthernet0/0/1.133"
+            ],
+            "enabled": true
+        },
+        "internet": {
+            "interfaces": [
+                "GigabitEthernet0/0/2"
+            ],
+            "enabled": true
+        },
+        "interconnect": {
+            "interfaces": [
+                "GigabitEthernet0/0/3.3900",
+                "GigabitEthernet0/0/3.3999"
+            ],
+            "enabled": true
+        },
+        "mgmt": {
+            "interfaces": [
+                "Loopback5"
+            ],
+            "enabled": true
+        },
+        "dmvpn": {
+            "interfaces": [
+                "Tunnel10"
+            ],
+            "enabled": true
+        },
+        "zscaler": {
+            "interfaces": [
+                "Tunnel50",
+                "Tunnel51"
+            ],
+            "enabled": true
+        },
+        "office_voice": {
+            "enabled": true,
+            "interfaces": "Looback10"
+        }
+    },
+    "interfaces": {
+        "GigabitEthernet0/0/0": {
+            "description": "Uplink to cnshacc2swi001-Via RBD-tempheraj",
+            "bandwidth": 1000000,
+            "auto_negotiate": true
+        },
+        "GigabitEthernet0/0/0.5": {
+            "description": " VRF MGMT INFRASTRUCTURE MANGEMENT",
+            "bandwidth": 1000000,
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "10.20.128.3/26",
+            "standby": "10.20.128.1"
+        },
+        "GigabitEthernet0/0/0.51": {
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/0.56": {
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/0.58": {
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/0.927": {
+            "description": "LIBHMWIFIGUEST",
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/0.928": {
+            "description": "LIBHMWIFIACCESS",
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/0.3902": {
+            "description": " VRF HKG-CLIENT TO LAN ROUTED DEVICE",
+            "bandwidth": 1000000,
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.186.128.10/31"
+        },
+        "GigabitEthernet0/0/0.3908": {
+            "description": " VRF LAN TO LAN ROUTED DEVICE",
+            "bandwidth": 1000000,
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "10.186.128.14/31"
+        },
+        "GigabitEthernet0/0/1": {
+            "description": "  VPLS REGIONAL WAN   PROVIDER CT  CIRUIT-ID ShanghaiCTVPLS50001C  BW 350 Mbps",
+            "bandwidth": 350000,
+            "auto_negotiate": true
+        },
+        "GigabitEthernet0/0/1.133": {
+            "description": "  VPLS REGIONAL WAN   PROVIDER CT  CIRUIT-ID ShanghaiCTVPLS50001C  BW 350 Mbps",
+            "bandwidth": 350000,
+            "mtu": 1562,
+            "ipv4": "10.0.128.19/23",
+            "mac_address": "00:00:0a:00:80:13"
+        },
+        "GigabitEthernet0/0/2": {
+            "description": " INTERNET INTERFACE INTERNETA  PROVIDER Telia International Carrier  CIRCUIT-ID ABC111111",
+            "bandwidth": 1000000,
+            "auto_negotiate": true,
+            "vrf": "INTERNET_A",
+            "mtu": 1500,
+            "ipv4": "58.40.147.118/30"
+        },
+        "GigabitEthernet0/0/3": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true
+        },
+        "GigabitEthernet0/0/3.3700": {
+            "description": " VRF lan INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "192.0.2.3/31"
+        },
+        "GigabitEthernet0/0/3.3900": {
+            "description": " VRF HKG-CLIENT INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.186.128.19/31"
+        },
+        "GigabitEthernet0/0/3.3902": {
+            "bandwidth": 1000000
+        },
+        "GigabitEthernet0/0/3.3999": {
+            "description": " VRF MGMT INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "10.20.143.255/31"
+        },
+        "GigabitEthernet0": {
+            "bandwidth": 1000000,
+            "auto_negotiate": true
+        },
+        "Loopback0": {
+            "bandwidth": 8000000
+        },
+        "Loopback5": {
+            "description": " MANAGEMENT INTERFACE",
+            "bandwidth": 8000000,
+            "vrf": "vpn5",
+            "mtu": 1514,
+            "ipv4": "10.20.143.253/32"
+        },
+        "Tunnel10": {
+            "description": " REGIONAL DMVPN HKG",
+            "bandwidth": 100,
+            "mtu": 1400,
+            "ipv4": "10.0.132.19/23"
+        },
+        "Tunnel50": {
+            "bandwidth": 20000,
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.17.206.217/30",
+            "destination": "58.220.95.14",
+            "source": "GigabitEthernet0/0/2"
+        },
+        "Tunnel51": {
+            "bandwidth": 20000,
+            "vrf": "vpn12",
+            "mtu": 1476,
+            "ipv4": "172.17.206.221/30",
+            "destination": "221.122.91.36",
+            "source": "GigabitEthernet0/0/2"
+        }
+    },
+    "dns_primary": "223.5.5.5",
+    "dns_secondary": "223.6.6.6",
+    "tracker_threshold": "400"
+}

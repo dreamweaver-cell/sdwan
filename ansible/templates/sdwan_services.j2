@@ -1,0 +1,31 @@
+"services": {
+    {% if router.services.vpls is defined %}
+        "vpls": [
+            "{{ vpls_interface }}"
+        ],
+    {% endif -%}
+    {%- if router.services.internet is defined %}
+        "internet": [
+            "{{ internet_interface }}"
+        ],
+    {% endif %}
+    {%- if router.services.zscaler_pop is defined %}
+        "zscaler_pop": [
+        ],
+    {% endif %}
+    {%- if router.services.lan -%}
+        {% if chassi == "c4331" or chassi == "c4431" %}
+            {% include 'cisco4k/sdwan_services_c4k.j2' %}                         {# Include sdwan services template #}
+        {% endif %}
+        {% if chassi == "c1111" %}
+            {% include 'cisco1k/sdwan_services_c1k.j2' %}                         {# Include sdwan services template #}
+        {% endif %}
+    {% endif %}
+    {%- if "zscaler" in router.services -%}
+        {% include 'services/zscaler_interfaces.j2' %}
+    {% endif %}
+        "mgmt": [
+            "Loopback5"
+        ]
+
+    },

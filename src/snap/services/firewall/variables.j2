@@ -1,0 +1,11 @@
+{
+    {% set vlanid = "" %}
+    {% for subinterface in services.firewall.interfaces %}
+        {% set vlanid = subinterface.split(".") %}
+        "vlan{{ vlanid[1] }}_sub_if_name" : "{{ subinterface }}",
+        "vlan{{ vlanid[1] }}_sub_if_description" : "{{ interfaces.get(subinterface).description }}",
+        "vlan{{ vlanid[1] }}_{{ redundant_router_type }}_ipv4_address" : "{{ interfaces.get(subinterface).ipv4 }}",
+        "vlan{{ vlanid[1] }}_vrrp_ipaddress" : "{{ interfaces.get(subinterface).standby }}",
+    {% endfor %}
+    "parent_lan_if_name": "{{ services.firewall.interfaces[0].split(".")[0] }}"
+}

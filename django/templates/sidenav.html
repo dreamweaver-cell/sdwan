@@ -1,0 +1,46 @@
+<!-- Sidebar -->
+<nav class="nav flex-column nav-pills nav-justified nav-fill" id="sidebar">
+    <div class="sidebar-header">
+        <h3 class="text-center">SNAP</h3>
+        <hr>
+    </div>
+
+    {% with url_name=request.resolver_match.url_name %}
+    <div class="dropdown">
+        <a
+            class="nav-link {% if url_name == 'home' %}active{% endif %}"
+            href={% url 'home' %}>
+            <i class="bi-house"></i>Home
+        </a>
+        <a
+            class="nav-link {% if url_name == 'browse_directory' %}active{% endif %}"
+            href="/files">
+            <i class="bi-filetype-json"></i>Config files
+        </a>
+        <a
+            class="nav-link {% if url_name == 'upload_file' %}active{% endif %}"
+            href="{% url 'upload_file' %}">
+            <i class="bi-upload"></i>Upload
+        </a>
+        <hr>
+        <a class="nav-link disabled " aria-current="page" href="#"><i class="bi-check2-square"></i>Ready</a>
+
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Services</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Internet</a></li>
+              <li><a class="dropdown-item" href="#">Zscaler</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Base</a></li>
+            </ul>
+        </li>
+        <hr>
+        <form class="d-flex">
+            <input class="form-control-sm" type="search" placeholder="Search device" aria-label="Search">
+        </form>
+
+
+    </div>
+    {% endwith %}
+</nav>

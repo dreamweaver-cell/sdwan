@@ -1,0 +1,55 @@
+---
+- name: Get Bootstrap
+  hosts: sdwan
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+
+  vars:
+    CFGDIR: "./"
+    FILENAME: "ciscosdwan.cfg"
+    CFGFILE: "{{ CFGDIR }}/{{ FILENAME }}"
+    UUID: "{{ sdwan.part_number }}-{{ sdwan.crypto_sn }}"
+    URL: "https://{{ vmanage_host }}/dataservice/system/device/bootstrap/device/{{ UUID | regex_replace('/', '%2F') }}?configtype=cloudinit&inclDefRootCert=false"
+
+  tasks:
+    - name: Delete old bootstrap file
+      ansible.builtin.file:
+        path: "{{ CFGFILE }}"
+        state: absent
+        force: true
+      delegate_to: localhost
+
+    - name: Download boot strap from vManage
+      uri:
+        url: "{{ URL }}"
+        user: "{{ vmanage_user }}"
+        password: "{{ vmanage_password }}"
+        method: GET
+        return_content: yes
+        validate_certs: no
+        force_basic_auth: yes
+      register: result
+      delegate_to: localhost
+
+    - ansible.builtin.debug:
+        msg: "{{ result.json.bootstrapConfig | regex_replace('\\n', '\n') }}"
+
+    - name: copy to file
+      ansible.builtin.copy:
+        content: "{{ result.json.bootstrapConfig | regex_replace('\\n', '\n') }}"
+        dest: "{{ CFGFILE }}"
+      delegate_to: localhost
+
+    - name: Enable SCP-server on router
+      cisco.ios.ios_config:
+        lines:
+          - ip scp server enable
+
+    - name: Upload config to router
+      net_put:
+        src: "{{ CFGFILE }}"
+        dest: "bootflash:/{{ FILENAME }}"
+        protocol: scp
+      vars:
+        ansible_command_timeout: 166
+        ansible_connection: ansible.netcommon.network_cli

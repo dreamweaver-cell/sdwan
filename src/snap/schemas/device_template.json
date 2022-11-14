@@ -1,0 +1,292 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "template_schema": {
+      "pattern": "PROD-EDGE-CLI-VOICE-[A-Z]{7}[1-9]RTR[0-9]{3}|PROD-EDGE-CLIENT-VPN12-ZSCALER|PROD-EDGE-CLIENT-VPN12|PROD-EDGE-ATEASCREEN-VPN30|PROD-EDGE-VPN0-V2|PROD-EDGE-VPN0-DYNAMIC|PROD-AAA-EMEA|PROD-AAA-APAC|PROD-AAA-AMER|PROD-EDGE-CLI-CONFIG|PROD-EDGE-CLI-CONFIG-ZSCALER-IPSEC|PROD-MGMT-VPN5|PROD-EDGE-LAN-VPN10-V2|PROD-EDGE-LAN-VPN1|PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC|PROD-GLOBAL|PROD-SNMP|PROD-EDGE-SYSTEM|PROD-COMPUTE-VPN20|PROD-EDGE-SWITCHPORT|Factory_Default_Cisco_Security_Template|Factory_Default_Cisco_VPN_512_Template|PROD-EDGE-OMP-EMEA|PROD-EDGE-OMP-AMER|PROD-EDGE-OMP-APAC|Factory_Default_Cisco_BFD_Template|PROD-EDGE-FLOWSCAPE-VPN40|PROD-EDGE-LAN-VPN101|PROD-EDGE-FW-DMZ-VPN800|PROD-EDGE-GUEST-VPN900|PROD-EDGE-GUEST-VPN900-IPSEC|ISR4K_VPN_512_Template|PROD-EDGE-WIFI-SWITCH-MODULE|PROD-EDGE-SYSTEM-GPS-V2|PROD-BANNER"
+    },
+    "generalTemplates_subtemplate": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "uniqueItems": true,
+        "additionalProperties": false,
+        "required": [
+          "templateName",
+          "templateType"
+        ],
+        "properties": {
+          "templateName": {
+            "type": "string",
+            "uniqueItems": true,
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "enum": [
+                  "PROD-VLAN101-SVI-VRRP-PRI",
+                  "PROD-VLAN101-SVI-VRRP-SEC",
+                  "PROD-VLAN101-SUBINT-VRRP-PRI",
+                  "PROD-VLAN101-SUBINT-VRRP-SEC",
+                  "PROD-VLAN111-SVI-VRRP-PRI",
+                  "PROD-VLAN111-SVI-VRRP-SEC",
+                  "PROD-VLAN3901-SUBINT",
+                  "PROD-VLAN3902-SUBINT",
+                  "PROD-VLAN3907-SUBINT",
+                  "PROD-VLAN3908-SUBINT",
+                  "PROD-EDGE-VPLS-PARENT-INTERFACE",
+                  "PROD-EDGE-INET-INT-R2-STATIC-APAC",
+                  "PROD-EDGE-INET-INT-R2-STATIC-EMEA",
+                  "PROD-EDGE-INET-INT-R2-STATIC-AMER",
+                  "PROD-INET-DEST-TLOC-EXT-APAC",
+                  "PROD-INET-DEST-TLOC-EXT-AMER",
+                  "PROD-INET-DEST-TLOC-EXT-EMEA",
+                  "PROD-INET-SOURCE-TLOC-EXT-APAC",
+                  "PROD-INET-SOURCE-TLOC-EXT-AMER",
+                  "PROD-INET-SOURCE-TLOC-EXT-EMEA",
+                  "PROD-EDGE-INET-INT-STATIC-NAT-EMEA",
+                  "PROD-EDGE-INET-INT-STATIC-NAT-AMER",
+                  "PROD-EDGE-INET-INT-STATIC-NAT-APAC",
+                  "PROD-EDGE-INET-INT-DHCP-EMEA",
+
+                  "PROD-EDGE-INET-INT-DHCP-AMER",
+                  "PROD-EDGE-INET-INT-DHCP-APAC",
+                  "PROD-EDGE-INET-INT-R2-DHCP-EMEA",
+                  "PROD-EDGE-INET-INT-R2-DHCP-AMER",
+                  "PROD-EDGE-INET-INT-R2-DHCP-APAC",
+                  "PROD-EDGE-INET-INT2-STATIC-EMEA",
+                  "PROD-EDGE-INET-INT2-STATIC-AMER",
+                  "PROD-EDGE-INET-INT2-STATIC-APAC",
+                  "PROD-EDGE-INET-INT2-DHCP-EMEA",
+                  "PROD-EDGE-INET-INT2-DHCP-AMER",
+                  "PROD-EDGE-INET-INT2-DHCP-APAC",
+                  "PROD-EDGE-CLIENT-VPN12-ZSCALER",
+                  "PROD-EDGE-INET-INT-STATIC",
+                  "PROD-EDGE-INET-INT2-STATIC",
+                  "PROD-EDGE-VPLS-STATIC",
+                  "PROD-EDGE-VPLS-STATIC-EMEA",
+                  "PROD-EDGE-VPLS-STATIC-APAC",
+                  "PROD-EDGE-VPLS-STATIC-AMER",
+                  "PROD-EDGE-VPLS-R2-STATIC-EMEA",
+                  "PROD-EDGE-VPLS-R2-STATIC-APAC",
+                  "PROD-EDGE-VPLS-R2-STATIC-AMER",
+                  "PROD-EDGE-GRE50",
+                  "PROD-EDGE-GRE51",
+                  "PROD-EDGE-LAN-PARENT-INTERFACE",
+                  "PROD-VLAN2-SVI-VRRP-PRI",
+                  "PROD-VLAN2-SUBINT-VRRP-PRI",
+                  "PROD-VLAN3-SVI-VRRP-PRI",
+                  "PROD-VLAN3-SUBINT-VRRP-PRI",
+                  "PROD-VLAN5-SVI-VRRP-PRI",
+                  "PROD-VLAN5-SUBINT-VRRP-PRI",
+                  "PROD-VLAN10-SVI-VRRP-PRI",
+                  "PROD-VLAN10-SUBINT-VRRP-PRI",
+                  "PROD-VLAN11-SVI-VRRP-PRI",
+                  "PROD-VLAN11-SUBINT-VRRP-PRI",
+                  "PROD-VLAN1-SVI-VRRP-PRI",
+                  "PROD-VLAN1-SUBINT-VRRP-PRI",
+                  "PROD-VLAN111-SUBINT-VRRP-PRI",
+                  "PROD-VLAN180-SVI-VRRP-PRI",
+                  "PROD-VLAN180-SVI-VRRP-SEC",
+                  "PROD-VLAN180-SUBINT-VRRP-PRI",
+                  "PROD-VLAN180-SUBINT-VRRP-SEC",
+                  "PROD-VLAN303-SUBINT-VRRP-PRI",
+                  "PROD-VLAN303-SUBINT-VRRP-SEC",
+                  "PROD-VLAN302-SUBINT-VRRP-PRI",
+                  "PROD-VLAN302-SUBINT-VRRP-SEC",
+                  "PROD-VLAN315-SUBINT-VRRP-PRI",
+                  "PROD-VLAN315-SUBINT-VRRP-SEC",
+                  "PROD-VLAN315-SVI-VRRP-PRI",
+                  "PROD-VLAN315-SVI-VRRP-SEC",
+                  "PROD-VLAN332-SUBINT-VRRP-PRI",
+                  "PROD-VLAN332-SUBINT-VRRP-SEC",
+                  "PROD-VLAN332-SVI-VRRP-PRI",
+                  "PROD-VLAN332-SVI-VRRP-SEC",
+                  "PROD-VLAN551-SVI-VRRP-PRI",
+                  "PROD-VLAN551-SVI-VRRP-SEC",
+                  "PROD-VLAN551-SUBINT-VRRP-PRI",
+                  "PROD-VLAN551-SUBINT-VRRP-SEC",
+                  "PROD-VLAN12-SVI-VRRP-PRI",
+                  "PROD-VLAN12-SUBINT-VRRP-PRI",
+                  "PROD-VLAN2-SUBINT-VRRP-SEC",
+                  "PROD-VLAN3-SUBINT-VRRP-SEC",
+                  "PROD-VLAN80-SUBINT-VRRP-PRI",
+                  "PROD-VLAN80-SVI-VRRP-PRI",
+                  "PROD-VLAN100-SVI-VRRP-PRI",
+                  "PROD-VLAN100-SUBINT-VRRP-PRI",
+                  "PROD-VLAN600-SUBINT",
+                  "PROD-VLAN601-SUBINT",
+                  "PROD-VLAN602-SUBINT",
+                  "PROD-VLAN603-SUBINT",
+                  "PROD-VLAN801-SUBINT-VRRP-PRI",
+                  "PROD-VLAN801-SUBINT-VRRP-SEC",
+                  "PROD-VLAN801-SVI-VRRP-PRI",
+                  "PROD-VLAN801-SVI-VRRP-SEC",
+                  "PROD-VLAN927-SUBINT-VRRP-PRI",
+                  "PROD-VLAN927-SVI-VRRP-PRI",
+                  "PROD-VLAN928-SUBINT-VRRP-PRI",
+                  "PROD-VLAN928-SVI-VRRP-PRI",
+                  "PROD-VLAN5-SVI-VRRP-SEC",
+                  "PROD-VLAN5-SUBINT-VRRP-SEC",
+                  "PROD-VLAN11-SVI-VRRP-SEC",
+                  "PROD-VLAN11-SUBINT-VRRP-SEC",
+                  "PROD-VLAN1-SVI-VRRP-SEC",
+                  "PROD-VLAN1-SUBINT-VRRP-SEC",
+                  "PROD-VLAN111-SUBINT-VRRP-SEC",
+                  "PROD-VLAN77-SUBINT-VRRP-PRI",
+                  "PROD-VLAN77-SUBINT-VRRP-SEC",
+                  "PROD-VLAN12-SVI-VRRP-SEC",
+                  "PROD-VLAN12-SUBINT-VRRP-SEC",
+                  "PROD-VLAN80-SUBINT-VRRP-SEC",
+                  "PROD-VLAN80-SVI-VRRP-SEC",
+                  "PROD-VLAN100-SVI-VRRP-SEC",
+                  "PROD-VLAN100-SUBINT-VRRP-SEC",
+                  "PROD-VLAN927-SUBINT-VRRP-SEC",
+                  "PROD-VLAN927-SVI-VRRP-SEC",
+                  "PROD-VLAN928-SUBINT-VRRP-SEC",
+                  "PROD-VLAN928-SVI-VRRP-SEC",
+                  "PROD-VLAN3920-SUBINT-VRRP-PRI",
+                  "PROD-VLAN3920-SUBINT-VRRP-SEC",
+                  "PROD-VLAN3921-SUBINT-VRRP-PRI",
+                  "PROD-VLAN3921-SUBINT-VRRP-SEC",
+                  "PROD-LOGGING",
+                  "PROD-EDGE-NTP-EMEA",
+                  "PROD-EDGE-NTP-AMER",
+                  "PROD-EDGE-NTP-APAC",
+                  "PROD-VPN512-ISR4K",
+                  "PROD-MGMT-LO5",
+                  "PROD-VOICE-LO10",
+                  "PROD-EDGE-SYSTEM-GPS-V2",
+                  "PROD-EDGE-IPSEC50",
+                  "PROD-EDGE-IPSEC51",
+                  "PROD-EDGE-CLIENT-OSPF",
+                  "PROD-EDGE-LAN-OSPF"
+                ]
+              }
+            ]
+          },
+          "templateType": {
+            "type": "string",
+            "uniqueItems": true,
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "enum": [
+                  "cisco_vpn_interface",
+                  "vpn-interface-svi",
+                  "cisco_vpn_interface_gre",
+                  "cisco_logging",
+                  "cisco_ntp",
+                  "cisco_vpn_interface_ipsec",
+                  "cisco_ospfv3"
+                ]
+              }
+            ]
+          },
+          "subTemplates": {
+            "type": "array"
+          }
+        }
+      }
+    },
+    "generalTemplates_name": {
+      "type": "string",
+      "uniqueItems": true,
+      "additionalProperties": false,
+      "$ref": "#/definitions/template_schema"
+    },
+    "generalTemplates_type": {
+      "type": "string",
+      "uniqueItems": true,
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "enum": [
+            "cisco_vpn",
+            "cli-template",
+            "cedge_aaa",
+            "cisco_bfd",
+            "cisco_omp",
+            "cisco_security",
+            "cisco_system",
+            "cedge_global",
+            "cisco_snmp",
+            "switchport",
+            "cisco_banner"
+          ]
+        }
+      ]
+    }
+  },
+  "properties": {
+    "configType": {
+      "type": "string"
+    },
+    "connectionPreference": {
+      "type": "boolean"
+    },
+    "connectionPreferenceRequired": {
+      "type": "boolean"
+    },
+    "deviceType": {
+      "type": "string"
+    },
+    "factoryDefault": {
+      "type": "boolean"
+    },
+    "policyId": {
+      "type": "string"
+    },
+    "policyName": {
+      "type": "string"
+    },
+    "templateClass": {
+      "type": "string"
+    },
+    "templateDescription": {
+      "type": "string"
+    },
+    "templateId": {
+      "type": "string"
+    },
+    "templateName": {
+      "type": "string"
+    },
+    "generalTemplates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "uniqueItems": true,
+        "additionalProperties": false,
+        "required": [
+          "templateName",
+          "templateType"
+        ],
+        "properties": {
+          "templateName": {
+            "type": "string",
+            "$ref": "#/definitions/generalTemplates_name"
+          },
+          "templateType": {
+            "type": "string",
+            "$ref": "#/definitions/generalTemplates_type"
+          },
+          "subTemplates": {
+            "$ref": "#/definitions/generalTemplates_subtemplate"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "configType",
+    "connectionPreference",
+    "connectionPreferenceRequired",
+    "deviceType",
+    "factoryDefault",
+    "policyId",
+    "policyName",
+    "templateClass",
+    "templateDescription",
+    "templateId",
+    "templateName"
+  ]
+}

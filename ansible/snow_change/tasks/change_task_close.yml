@@ -1,0 +1,45 @@
+---
+- block:
+  - ansible.builtin.debug:
+      msg: "{{sn_change_1}}"
+  - name: Move Change from implement to review
+    servicenow.servicenow.snow_record:
+      state: present
+      table: change_request
+      username: "{{ sn_username }}"
+      password: "{{ sn_password }}"
+      instance: "{{ sn_instance }}"
+      number: "{{ sn_change_1.record['number'] }}"
+      data:
+        state: "0"
+    register: update_incident
+    
+  - ansible.builtin.debug:
+      var: update_incident.record
+
+  - name: Closing task
+    servicenow.servicenow.snow_record:
+      state: present
+      table: change_task
+      username: "{{ sn_username }}"
+      password: "{{ sn_password }}"
+      instance: "{{ sn_instance }}"
+      number: "{{ sn_task_1.record['number'] }}"
+      data:
+        close_notes: "{{ sat_note | default('') }}"
+        close_code: "{{ sat_code | default('successful') }}"
+        state: "3"
+
+  - name: CLOSE CHANGE
+    servicenow.servicenow.snow_record:
+      state: present
+      table: change_request
+      username: "{{ sn_username }}"
+      password: "{{ sn_password }}"
+      instance: "{{ sn_instance }}"
+      number: "{{ sn_change_1.record['number'] }}"
+      data:
+        close_notes: "{{ sat_note | default('') }} "
+        close_code: "{{ sat_code | default('successful') }}"
+        state: "3"
+  delegate_to: localhost

@@ -1,0 +1,163 @@
+---
+# Ansible Playbook to upgrade Cisco IOS
+
+- name: Upgrade CISCO IOS
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  vars:
+    upgrade_ios_version: 16.03.02
+    ftp_server_ip: 10.61.95.134
+
+  tasks:
+    - name: INCLUDE CHANGE VARIABLES
+      ansible.builtin.include_vars: rommon_cr_vars.yml
+
+    # Pre-checks
+    - name: Check Current IOS Version
+      cisco.ios.ios_facts:
+        gather_subset:
+          - "hardware"
+
+    - name: Check ROMmon Version
+      cisco.ios.ios_command:
+        commands: "show rom-monitor rp active"
+      register: rommon
+    - ansible.builtin.set_fact:
+        version: "{{ rommon.stdout[0] | parse_cli_textfsm(ntc_templates+'cisco_xe_show_rom-monitor.textfsm') }}"
+    - ansible.builtin.set_fact:
+        rom: "{{ version[0]['VERSION'] }}"
+    - ansible.builtin.set_fact:
+        major: "{{ rom.split('.')[0] | int }}"
+        minor: "{{ rom.split('.')[1].split('(')[0] | int }}"
+
+    - ansible.builtin.debug:
+        msg:
+          - "rommon version is : {{ rom }}"
+          - "major is: {{ major }}"
+          - "minor is: {{ minor }}"
+
+    - name: Stop Play If rommon Version Is Correct
+      ansible.builtin.meta: end_host
+      when: (major|int > 16) or
+        (major|int == 16 and minor|int > 7) or
+        (rom == '16.7(5r)')
+
+    - name: Ping Check To Ftp
+      cisco.ios.ios_command:
+        commands: ping vrf MGMT "{{ ftp_server_ip }}"
+      register: ftp_ping_check
+
+    # Chose correct IOS
+
+    - name: Report Unreachable
+      ansible.builtin.fail:
+        msg: "Ping test to ftp server {{ ftp_server_ip }} failed"
+      when: ftp_ping_check.stdout[0].find("Success rate is 0 percent") != -1
+
+    - name: Set ISR4300 Image
+      ansible.builtin.set_fact:
+        new_rommon: isr4200_4300_rommon_167_5r_SPA.pkg
+      when: ansible_net_model is regex('ISR43[1-5]{2}')
+
+    - name: Set ISR4400 Image
+      ansible.builtin.set_fact:
+        new_rommon: isr4400_rommon_167_5r_SPA.pkg
+      when: ansible_net_model is regex('ISR44[1-5]{2}')
+
+    - name: Ping Check To Ftp
+      cisco.ios.ios_command:
+        commands: ping vrf MGMT "{{ ftp_server_ip }}"
+      register: ftp_ping_check
+
+    - name: set ftp source interface
+      ios_config:
+        lines:
+          - ip ftp source-interface Loopback5
+
+    - name: Fetch New Image To Bootflash
+      vars:
+        ansible_command_timeout: 3600
+      cisco.ios.ios_command:
+        commands:
+          - command: "copy ftp://{{ ftp_server_ip }}/iosxe/{{ new_rommon }} bootflash:"
+            prompt: 'Destination filename \[{{ new_rommon }}\]'
+            answer: "\r"
+        wait_for: result[0] contains OK
+
+    - name: Verify Image File
+      cisco.ios.ios_command:
+        commands: "verify bootflash:/{{ new_rommon }}"
+      register: image_verification_results
+
+    - name: Set image_integrity_check to pass/fail
+      ansible.builtin.set_fact:
+        image_integrity_check: "pass"
+      when: image_verification_results.stdout[0].find('Digital signature successfully verified') != -1
+
+    - name: Fail Task If Image Integrity Check Fails
+      ansible.builtin.fail:
+        msg: "Image Integrity Check Fails. Please check the uploaded image!"
+      when: image_verification_results.stdout[0].find('Digital signature successfully verified') == -1
+
+    - name: Upgrade rommon
+      vars:
+        ansible_command_timeout: 3600
+      cisco.ios.ios_command:
+        commands: "upgrade rom-monitor filename bootflash:{{ new_rommon }} r0"
+      register: rommon_verification_results
+
+    - ansible.builtin.set_fact:
+        sn_start_date: '{{lookup(''pipe'',''date -u +%Y-%m-%d" "%H:%M:00'')}}'
+        sn_end_date: '{{lookup(''pipe'',''date -u -d "+1 hour" +%Y-%m-%d" "%H:%M:00'')}}'
+
+    - ansible.builtin.import_tasks: create_change_task.yml
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "ROMMON upgrade started. Reloadng device."
+        hooks:
+          - "{{ migration_webhook }}"
+          - "{{ operations_webhook }}"
+      ignore_errors: true
+
+    # Reload Device
+    - ansible.builtin.import_tasks: ./tasks/ios_reload.yml
+      ignore_errors: true
+
+    # Wait for router to get back from reboot
+    - name: reset the connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait 2600 seconds but only start checking after 180 seconds ( 3 minutes )
+      ansible.builtin.wait_for_connection:
+        delay: 180
+        timeout: 2600
+      ignore_errors: true
+
+    # reset connetion again
+    - name: reset the connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Check ROMmon Version
+      cisco.ios.ios_command:
+        commands: "show rom-monitor rp active"
+      register: rommon
+      ignore_errors: true
+
+    # Close Change and Task in Service Now
+    # - name: Close Change and Task in Service Now
+    - ansible.builtin.import_tasks: close_change_task.yml
+      vars:
+        sat_code: "successful"
+      ignore_errors: true
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        color: "00EE00"
+        msg: "ROMMON upgrade completed"
+        templ: "notify.j2"
+        hooks:
+          - "{{ migration_webhook }}"
+          - "{{ operations_webhook }}"

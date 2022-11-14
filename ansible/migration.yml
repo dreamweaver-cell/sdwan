@@ -1,0 +1,161 @@
+---
+- hosts: sdwan
+  gather_facts: false
+  connection: network_cli
+  vars:
+    critical_alarm: false
+    warnings_alarm: false
+    sat_code: 'successful'
+
+  tasks:
+    - name: check limit is set
+      ansible.builtin.fail:
+        msg: "you must use -l or --limit"
+      when: ansible_limit is not defined
+      run_once: true
+
+    - name: Check auto_negotiate on Internet
+      ansible.builtin.fail:
+        msg: "NO AUTONEG ON INTERNET INTERFACE: {{ sdwan.internet_if_name }}"
+      when: sdwan.internet_if_name is defined and not sdwan.interfaces[sdwan.internet_if_name].auto_negotiate
+
+    - name: Pre SDWAN tests
+      ansible.builtin.import_role:
+        name: sdwan-test
+      vars:
+        - sdwan_services: "{{ sdwan.services.keys()|list }}"
+        - pre_migration: true
+
+    - ansible.builtin.set_fact:
+        table: "{{ table | default({}) | combine( { item.key: item.value } ) }}"
+      loop: "{{ latency_pre|dict2items }}"
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Migration started. Reloadng device."
+        hooks:
+          - "{{ migration_webhook }}"
+          - "{{ operations_webhook }}"
+
+    # Reload Device
+    - ansible.builtin.import_tasks: ./tasks/ios_reload.yml
+      ignore_errors: true
+
+    # Wait for router to get back from reboot
+    - name: reset the connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait 30 minutes, but only start checking after 360 seconds ( 6 minutes )
+      ansible.builtin.wait_for_connection:
+        delay: 360
+        timeout: 1800
+      ignore_errors: true
+
+    # reset connetion again
+    - name: reset the connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait 30 more minutes
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 1800
+      ignore_errors: true
+
+    - name: Gather Facts
+      cisco.ios.ios_facts:
+
+    - name: Check New Version
+      ansible.builtin.assert:
+        that:
+          - upgrade_ios_version == ansible_net_version
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Reload completed. Starting SAT-tests."
+        hooks:
+          - "{{ migration_webhook }}"
+
+    # Execute SAT test and verify connectivity
+    - name: Post SDWAN tests
+      ansible.builtin.import_role:
+        name: sdwan-test
+      vars:
+        - sdwan_services: "{{ sdwan.services.keys()|list }}"
+
+    # Close Change and Task in Service Now
+    - ansible.builtin.include_vars: change_request_vars.yml
+      ignore_errors: true
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Attaching template."
+        hooks:
+          - "{{ migration_webhook }}"
+
+    - name: Build critical test result
+      ansible.builtin.set_fact:
+        alarm_msg:
+            "{{ alarm_msg | default([]) + [ item ] }}"
+        critical_alarm: true
+      when: not item.successful and item.severity == 'critical'
+      loop: "{{ test_result }}"
+
+    - name: Build warnings test result
+      ansible.builtin.set_fact:
+        warnings_msg:
+            "{{ warnings_msg | default([]) + [ item ] }}"
+        warnings: true
+      when: not item.successful and item.severity == 'warning'
+      loop: "{{ test_result }}"
+
+    - ansible.builtin.set_fact:
+        msg: "Migration completed. Site is up in SDWAN-mode! &#x1F64C;"
+        color: "00EE00"
+      when: not critical_alarm
+
+    - ansible.builtin.set_fact:
+        msg: "Migration ended with errors"
+        color: "EE0000"
+        sat_code: 'unsuccessful'
+      when: critical_alarm
+
+    - ansible.builtin.set_fact:
+        msg: "Migration ended with warnings"
+        color: "FFFF00"
+      when: warnings_alarm
+
+    - name: Write Change RTT notes
+      ansible.builtin.set_fact:
+        sat_note:
+          - playbook: "The Playbook was: {{ sat_code }}"
+          - test50: "Pre-migration rtt to EMEA:{{ latency_pre.sth | default('N/A') }}"
+          - test105: "Post-migration rtt to EMEA:{{ latency_post.sth | default('N/A') }}"
+          - test55: "Pre-migration rtt to APAC:{{ latency_pre.hkg | default('N/A') }}"
+          - test110: "Post-migration rtt to APAC:{{ latency_post.hkg | default('N/A') }}"
+          - test60: "Pre-migration rtt to AMER:{{ latency_pre.sec | default('N/A') }}"
+          - test115: "Post-migration rtt to AMER:{{ latency_post.sec | default('N/A') }}"
+
+    - name: Write Change Alarm notes
+      ansible.builtin.set_fact:
+        sat_note:
+          "{{ sat_note | default([]) + [item.description, 'Result Successful' if item.successful else 'Result Unsuccessful'] }}"
+      loop: "{{ test_result }}"
+
+    # Close Change Request and Task for the operation
+    - name: Close Service-Now Request
+      ansible.builtin.include_role:
+        name: "{{ ansible_inventory_dir }}/roles/snow_change"
+        tasks_from: close_change_task.yml
+      vars:
+        - close_notes: "{{ sat_note | default('sat note failure') }}"
+        - close_code: "{{ sat_code | default('successful') }}"
+      ignore_errors: true
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        color: "{{ color }}"
+        msg: "{{ msg }}"
+        templ: "notify_post.j2"
+        hooks:
+          - "{{ migration_webhook }}"
+          - "{{ operations_webhook }}"

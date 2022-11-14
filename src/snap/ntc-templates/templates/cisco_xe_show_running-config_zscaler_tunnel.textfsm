@@ -1,0 +1,18 @@
+Value INTNAME (\S*)
+Value BANDWIDTH (\S*)
+Value VRF (\S*)
+Value IPV4 (\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
+Value MASK (\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
+Value SOURCE ([A-Z][\w\-\.:\/]+)
+Value TUNNELVRF (\S*)
+Value DEST (\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
+
+Start
+  ^interface\s+${INTNAME}
+  ^\s*bandwidth\s+${BANDWIDTH}
+  ^\s*vrf\s*forwarding\s+${VRF}
+  ^\s*ip\s*address\s+${IPV4}\s+${MASK}
+  ^\s*tunnel\s*source\s+${SOURCE}
+  ^\s*tunnel\s*destination\s+${DEST}
+  ^\s*tunnel\s*vrf\s+${TUNNELVRF}
+

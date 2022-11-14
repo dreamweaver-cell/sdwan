@@ -1,0 +1,47 @@
+---
+- name: Check versions
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Check Current IOS Version
+      cisco.ios.ios_facts:
+        gather_subset:
+          - "hardware"
+    - ansible.builtin.set_fact:
+        major: "{{ ansible_net_version.split('.')[0] | int }}"
+        minor: "{{ ansible_net_version.split('.')[1].split('.')[0] | int }}"
+    - ansible.builtin.debug:
+        msg:
+          - "IOS version is : {{ ansible_net_version }}"
+          - "major is: {{ major }}"
+          - "minor is: {{ minor }}"
+
+    - name: Check IOS version at least 16.2
+      ansible.builtin.assert:
+        that:
+          - major|int == 17 or major|int == 16 and minor|int >= 2
+
+    - name: Check ROMmon Version
+      cisco.ios.ios_command:
+        commands: "show rom-monitor rp active"
+      register: rommon
+    - ansible.builtin.set_fact:
+        version: "{{ rommon.stdout[0] | parse_cli_textfsm(ntc_templates+'cisco_xe_show_rom-monitor.textfsm') }}"
+    - ansible.builtin.set_fact:
+        rom: "{{ version[0]['VERSION'] }}"
+    - ansible.builtin.set_fact:
+        major: "{{ rom.split('.')[0] | int }}"
+        minor: "{{ rom.split('.')[1].split('(')[0] | int }}"
+
+    - ansible.builtin.debug:
+        msg:
+          - "rommon version is : {{ rom }}"
+          - "major is: {{ major }}"
+          - "minor is: {{ minor }}"
+
+    - name: Check ROMmon version at least 16.7
+      ansible.builtin.assert:
+        that:
+          - major|int == 16 and minor|int >= 7

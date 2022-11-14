@@ -1,0 +1,61 @@
+---
+# tasks file for sdwan-test,
+- name: Initiating tests on {{  inventory_hostname }}
+  ansible.builtin.debug:
+    msg: "{{ sdwan_services }}"
+
+# All pre SAT testing goes here
+- name: Initiating pre-tests
+  block:
+    - name: Run pre-tests on client service
+      ansible.builtin.include: roles/sdwan-test/tasks/pre-tests/50_pre_client.yml
+  when: run_pretest | default(false)
+
+- name: All Pre migration tests
+  block:
+    - name: Run pre-tests on client service
+      ansible.builtin.include: roles/sdwan-test/tasks/pre-tests/migration_pre_mgmt.yml
+  when: pre_migration | default(false)
+
+# All SAT testing goes here
+- name: Initiating post-tests
+  block:
+    - name: Run post-tests verify sdwan controllers
+      ansible.builtin.include: 05_sdwan_controlers.yml
+
+    - name: Run post-tests on client service
+      ansible.builtin.include: 50_client.yml
+      when: '"lan" in sdwan_services'
+
+    - name: Run tests on lan service
+      ansible.builtin.include: 100_lan.yml
+      when: '"lan" in sdwan_services'
+
+    - name: Run tests on vpls service
+      ansible.builtin.include: 150_vpls.yml
+      when: '"vpls" in sdwan_services'
+
+    - name: Run tests on zscaler related services
+      ansible.builtin.include: 200_zscaler.yml
+      when: '"zscaler_ipsec" in sdwan_services and not "office_ds_switch_ospfv3" in sdwan_services'
+
+    - name: Run tests on ospfv3 related services
+      ansible.builtin.include: 250_office_ds_switch_ospfv3.yml
+      when: '"office_ds_switch_ospfv3" in sdwan_services'
+
+    - name: Run tests on guestwifi related services
+      ansible.builtin.include: 300_guestwifi.yml
+      when: '"guestwifi" in sdwan_services'
+
+    - name: Run tests on atea screen related services
+      ansible.builtin.include: 350_office_atea_screen.yml
+      when: '"office_atea_screen" in sdwan_services'
+
+    - name: Run tests on compute related services
+      ansible.builtin.include: 400_office_compute.yml
+      when: '"office_compute" in sdwan_services'
+  when: not run_pretest and not pre_migration
+
+# CLean and print
+- name: Result Summary
+  ansible.builtin.include: results.yml

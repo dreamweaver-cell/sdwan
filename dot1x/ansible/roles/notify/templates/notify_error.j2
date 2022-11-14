@@ -1,0 +1,30 @@
+<h2><b>{{ inventory_hostname }}</b></h2>
+{{ now(fmt="%Y-%m-%d %H:%M:%S") }}: <b>{{ summary }}</b><br>
+warnings_msg
+{% if alarm_msg is defined %}
+<table style="width:100%">
+<tr>
+<th>Description</th><th>Name</th><th>Successful</th>
+</tr>
+{% for alarms in alarm_msg %}
+<tr><td>{{ alarms['description'] }}</td><td>{{ alarms['name'] }}</td><td>{{ alarms['successful'] }}</td></tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if table is defined and table %}
+<hr>
+<table style="width:100%">
+    {% for key, value in table.items() %}
+    <tr>
+        <td>{{ key }}</td><td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if error_msg is defined %}
+    ERROR MSG:<br>
+    {{ error_msg }}
+    <hr>
+{% endif %}

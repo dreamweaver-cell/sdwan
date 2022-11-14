@@ -1,0 +1,20 @@
+{
+    "version": "v1.1",
+    "device_name": "{{ router.device_name }}",
+    "part_number": "{{ router.part_number }}",
+    "device_serial_number": "{{ router.device_serial_number }}",
+    {% if router.services.internet.ipv4 != "dhcp_negotiated" %}
+    "vpn0_next_hop_ip_address": "{{ router.services.internet.ipv4_gw }}",
+    {% endif%}
+    "system_longitude": "{{ router.system_longitude }}",
+    "system_latitude": "{{ router.system_latitude }}",
+    {% include 'sdwan_routing.j2' %}                                {# Include sdwan routing template #}
+    {% include 'sdwan_services.j2' %}                               {# Include sdwan services template #}
+    {% if chassi == "c4331" or chassi == "c4431" %}
+        {% include 'cisco4k/sdwan_c4k.interfaces.j2' %}                         {# Include sdwan services template #}
+    {% endif %}
+    {% if chassi == "c1111" %}
+        {% include 'cisco1k/sdwan_c1k.interfaces.j2' %}
+    {% endif %}
+    "redundant_router_type": "pri"
+}

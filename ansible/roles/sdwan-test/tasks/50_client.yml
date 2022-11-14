@@ -1,0 +1,55 @@
+---
+
+# TEST 1
+  - name: TEST 55 client - Test reachability and latency to GPR (STH) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.61.95.134
+          vrf: '12'
+        register: ping_sth_gpr_b
+      - ansible.builtin.set_fact:
+          latency_post: "{{ latency_post | combine( { 'sth': ping_sth_gpr_b['rtt']['avg'] } ) }}"
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client vpn12
+        ansible.builtin.debug:
+          msg: "client test_55 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to STH', 'name':'test_55', 'successful': not ping_sth_gpr_b['failed'] }] }}"
+
+# TEST 2
+  - name: TEST 60 client - Test reachability and latency to GPR (HKG) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.200.95.59
+          vrf: '12'
+        register: ping_hkg_gpr_b
+      - ansible.builtin.set_fact:
+          latency_post: "{{ latency_post | combine( { 'hkg': ping_hkg_gpr_b['rtt']['avg'] } ) }}"
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client vpn12
+        ansible.builtin.debug:
+          msg: "client test_60 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to HKG', 'name':'test_60', 'successful': not ping_hkg_gpr_b['failed'] }] }}"
+
+ # TEST 3
+  - name: TEST 65 client - Test reachability and latency to GPR (SEC) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.70.93.46
+          vrf: '12'
+        register: ping_sec_gpr_b
+      - ansible.builtin.set_fact:
+          latency_post: "{{ latency_post | combine( { 'sec': ping_sec_gpr_b['rtt']['avg'] } ) }}"
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client vpn12
+        ansible.builtin.debug:
+          msg: "client test_65 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to SEC', 'name':'test_65', 'successful': not ping_sec_gpr_b['failed'] }] }}"

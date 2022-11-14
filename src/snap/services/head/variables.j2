@@ -1,0 +1,56 @@
+{
+    {# DEFAULT VARIABLES #}
+    {# Will be added if not already in snapconfig-file #}
+    "system_host_name": "{{ device_name }}",
+    "system_system_ip": "{{ system_ip }}",
+    "system_site_id": "{{ site_id }}",
+    "system_latitude": "0.00",
+    "system_longitude": "0.00",
+    "dns_primary": "8.8.8.8",
+    "dns_secondary": "8.8.4.4",
+    "tracker_threshold": "300",
+    "default_prefix": "TEMPLATE_IGNORE",
+    "default2_prefix": "TEMPLATE_IGNORE",
+    "default3_prefix": "TEMPLATE_IGNORE",
+    "default4_prefix": "TEMPLATE_IGNORE",
+    "vpn0_next_hop_ip_address": "TEMPLATE_IGNORE",
+    "vpn0_next_hop_ip_address2": "TEMPLATE_IGNORE",
+    "vpn0_next_hop_ip_address3": "TEMPLATE_IGNORE",
+    "vpn0_next_hop_ip_address4": "TEMPLATE_IGNORE",
+    "vpn0_lib_tracker_name": "nat-lib-check",
+    "vpn10_static_tracker_name": "TEMPLATE_IGNORE",
+    "vpn10_static_tracker_endpoint_ip": "TEMPLATE_IGNORE",
+    "vpn10_next_hop_ip_1": "TEMPLATE_IGNORE",
+    "access_if_1": "TEMPLATE_IGNORE",
+    "access_if_1_vlan": "TEMPLATE_IGNORE",
+    "access_if_2": "TEMPLATE_IGNORE",
+    "access_if_2_vlan": "TEMPLATE_IGNORE",
+    "access_if_3": "TEMPLATE_IGNORE",
+    "access_if_3_vlan": "TEMPLATE_IGNORE",
+    "access_if_4": "TEMPLATE_IGNORE",
+    "access_if_4_vlan": "TEMPLATE_IGNORE",
+    "access_if_5": "TEMPLATE_IGNORE",
+    "access_if_5_vlan": "TEMPLATE_IGNORE",
+    "access_if_6": "TEMPLATE_IGNORE",
+    "access_if_6_vlan": "TEMPLATE_IGNORE",
+    "access_if_7": "TEMPLATE_IGNORE",
+    "access_if_7_vlan": "TEMPLATE_IGNORE",
+    "access_if_8": "TEMPLATE_IGNORE",
+    "access_if_8_vlan": "TEMPLATE_IGNORE",
+    "trunk_if_1": "TEMPLATE_IGNORE",
+    "trunk_if_1_allowed_vlans": "TEMPLATE_IGNORE",
+    "trunk_if_1_native_vlan": "TEMPLATE_IGNORE",
+    "trunk_if_2": "TEMPLATE_IGNORE",
+    "trunk_if_2_allowed_vlans": "TEMPLATE_IGNORE",
+    "trunk_if_2_native_vlan": "TEMPLATE_IGNORE",
+
+    {% if "C1111" in part_number %}
+        "parent_lan_if_name": "GigabitEthernet0/1/7",
+        "wlan_if_shutdown": "{{ wlan_if_shutdown | default ("true", true) }}"
+    {% endif %}
+
+    {% if "ISR4" in part_number %}
+        "parent_lan_if_name": "{{ services.lan.interfaces[0].split(".")[0] }}"
+    {% endif %}
+
+}

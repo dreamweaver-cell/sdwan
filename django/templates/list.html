@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <h3>SDWAN CONFIGURATIONS</h3>
+
+  <div class="filelisting">
+    <ul class="list-group">
+    {% for basename, link_target in directory_directories %}
+      {% if link_target %}
+        <li class="p-1"><a href="{% url 'snapfiles' link_target %}">{{ basename }}/</a></li>
+      {% else %}
+        <li>{{ basename }}/</li>
+      {% endif %}
+    {% endfor %}
+
+    {% for basename, link_target in directory_files %}
+      {% if link_target %}
+        <a href="{% url 'snapfiles' link_target %}" class="list-group-item p-1 ">{{ basename }}</a></li>
+      {% else %}
+        <li class="list-group-item">>{{ basename }}</li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

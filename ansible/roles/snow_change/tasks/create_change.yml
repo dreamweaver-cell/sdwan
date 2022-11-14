@@ -1,0 +1,31 @@
+---
+- name: Creating Service-Now Change
+  servicenow.servicenow.snow_record:
+    state: present
+    table: change_request
+    username: "{{ sn_username }}"
+    password: "{{ sn_password }}"
+    instance: "{{ sn_instance }}"
+    data:
+      short_description: "{{ sn_short_description }}"
+      description: "{{ sn_description }}"
+      justification: "{{ sn_justification }}"
+      implementation_plan: "{{ sn_implementation_plan }}"
+      risk_impact_analysis: "{{ sn_risk_impact_analysis }}"
+      backout_plan: "{{ sn_backout_plan }}"
+      test_plan: "{{ sn_test_plan }}"
+      assignment_group: "{{ sn_assignment_group }}"
+      assigned_to: "{{ sn_assigned_to }}"
+      risk: "{{ sn_risk }}"
+      severity: "{{ sn_severity }}"
+      priority: "{{ sn_priority }}"
+      business_service: "{{ sn_business_service }}"
+      service_offering: "{{ sn_service_offering }}"
+      cmdb_ci: "{{ sn_cmdb_ci }}"
+      start_date: "{{ sn_start_date }}"
+      end_date: "{{ sn_end_date }}"
+  register: sn_change
+  delegate_to: localhost
+
+- ansible.builtin.set_fact:
+    sn_change_nr:  "{{ sn_change.record.number }}"

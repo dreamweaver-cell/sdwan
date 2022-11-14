@@ -1,0 +1,22 @@
+---
+- name: Site Acceptance Test (SAT)
+  hosts: sdwan
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.import_tasks: ios_sat_test.yml
+
+    - ansible.builtin.set_fact:
+        table:
+          network diff: "{{ test4.stderr | replace('Network missing:','') }}"
+      when: test4.stderr != ''
+
+    - ansible.builtin.set_fact:
+        msg: "TEST MESSAGE"
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "{{ msg }}"
+        hooks:
+          - "{{ sandladan }}"

@@ -1,0 +1,166 @@
+---
+- name: Provision router in vmanage
+  hosts: sdwan
+  connection: network_cli
+  gather_facts: false
+  vars:
+    critical_alarm: false
+    warnings_alarm: false
+    sat_code: 'successful'
+
+  tasks:
+    - name: Run pre-checks
+      block:
+        - name: check limit is set
+          ansible.builtin.fail:
+            msg: "you must use -l or --limit"
+          when: ansible_limit is not defined
+          run_once: true
+
+        # Verify that the router is migrated to SDWAN
+        - name: check if migrated
+          cisco.ios.ios_command:
+            commands: show ip vrf
+          register: output
+          failed_when: "'MGMT' in output.stdout[0]"
+
+        # login to Vmanage
+        - ansible.builtin.import_tasks: ./tasks/vmanage_authentication.yml
+
+        # Get full list of devices from vmanage and filter out ansible-limit from list of dictionary
+        - name: Get template list from vmanage
+          uri:
+            url: "https://{{ vmanage_host }}/dataservice/template/device"
+            method: GET
+            headers:
+              Content-Type: "application/json"
+              Cookie: "{{ vauth.cookies_string }}"
+            validate_certs: false
+            body_format: json
+          register: data
+
+        # Set attatched if device template is attached to at least 1
+        - ansible.builtin.set_fact:
+            attached: "{{ data.json.data | selectattr('templateName', 'eq', inventory_hostname+'-snap') | map(attribute='devicesAttached') | first | bool }}"
+
+        - name: Check that router is already attached
+          ansible.builtin.fail:
+            msg: Router is not attached in vmanage
+          when: not attached
+        # Check if there is a diff in vmanage and the router
+        - name: Diff SNAP file to VMANAGE
+          vmanage_diff:
+            hostname: "{{ inventory_hostname }}"
+            log: true
+          register: pre_snap_sync
+
+        - name: End if diff
+          ansible.builtin.meta: end_host
+          when: not pre_snap_sync.meta.changes
+
+        # Run basic connectivity Pre tests
+        - name: Pre SDWAN tests
+          ansible.builtin.import_role:
+            name: sdwan-test
+          vars:
+            - sdwan_services: "{{ sdwan.services.keys()|list }}"
+            - run_pretest: true
+
+      rescue:
+        - name: Notify on errors
+          ansible.builtin.include_role:
+            name: notify
+            tasks_from: provision_error.yml
+        - ansible.builtin.fail:
+            msg: Error during prechecks
+
+    # Run block if not in sync
+    - name: Provision to vmanage
+      block:
+        # Detach device template to Vmanage
+        - ansible.builtin.import_tasks: ./tasks/detach_template.yml
+
+        # Update feature templates (CLI-templates) here
+
+        # Push device template to Vmanage
+        - ansible.builtin.import_tasks: ./tasks/push_device_template.yml
+          vars:
+            template_file: "{{ inventory_hostname }}.json"
+
+        # Migrate Zscaler IPSEC2GRE
+        - name: Migrate GRE template to IPsec in Zscaler portal
+          command: zs migrate {{ inventory_hostname }}
+          run_once: true
+          delegate_to: localhost
+          tags: [never, zs_migrate]
+
+        # Attach new device
+        - name: Attach device templates and variables to Vmanage
+          command: snap --attach {{ inventory_hostname }}
+          run_once: true
+          delegate_to: localhost
+      rescue:
+        - name: Notify on errors
+          ansible.builtin.include_role:
+            name: notify
+            tasks_from: provision_error.yml
+
+    - name: Post checks
+      block:
+        # Run basic connectivity tests
+        - name: Pre SDWAN tests
+          ansible.builtin.import_role:
+            name: sdwan-test
+          vars:
+            - sdwan_services: "{{ sdwan.services.keys()|list }}"
+
+        - name: Build warnings test result
+          ansible.builtin.set_fact:
+            warnings_msg:
+                "{{ warnings_msg | default([]) + [ item ] }}"
+            warnings: true
+          when: not item.successful and item.severity == 'warning'
+          loop: "{{ test_result }}"
+
+        - ansible.builtin.set_fact:
+            msg: Re-Provisioning Completed! &#x1F64C;"
+            color: "00EE00"
+          when: not critical_alarm
+
+        - ansible.builtin.set_fact:
+            msg: "Provisioning ended with errors"
+            color: "EE0000"
+            sat_code: 'unsuccessful'
+          when: critical_alarm
+
+        - ansible.builtin.set_fact:
+            msg: "Provisioning ended with warnings"
+            color: "FFFF00"
+          when: warnings_alarm
+
+        # Check if diff is in sync
+        - name: Diff SNAP file to VMANAGE
+          vmanage_diff:
+            hostname: "{{ inventory_hostname }}"
+            log: true
+          register: snap_sync
+
+        - name: Compare configuration
+          ansible.builtin.set_fact:
+            validate_configuration: "successful"
+          when: not snap_sync.meta.changes
+
+        - ansible.builtin.import_tasks: notify.yml
+          vars:
+            color: "{{ color }}"
+            msg: "{{ msg }} {{}}"
+            templ: "notify_post_snap_attach.j2"
+            hooks:
+              - "{{ general_webhook }}"
+
+      when: attached and pre_snap_sync.diff
+      rescue:
+        - name: Notify on errors
+          ansible.builtin.include_role:
+            name: notify
+            tasks_from: provision_error.yml

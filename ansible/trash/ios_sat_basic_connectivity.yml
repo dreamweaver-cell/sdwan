@@ -1,0 +1,51 @@
+# test connectivity on Guest Wifi
+- name: TEST 1 - Test reachability to 8.8.8.8 from Guest Wifi VRF (vManage vpn 900)
+  cisco.ios.ios_ping:
+    dest: 8.8.8.8
+    vrf: "900"
+  register: test1
+  ignore_errors: true
+# test connectivity on H&M internal network
+- name: TEST 2 - Test reachability to secc1327 from Client vrf (vManage vpn 12)
+  cisco.ios.ios_ping:
+    dest: 10.61.95.134
+    vrf: "12"
+  register: test2
+  ignore_errors: true
+# test connectivity on H&M internal network
+- name: TEST 3 - Test reachability to secc1327 from MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.61.95.134
+    vrf: "5"
+    source: loopback5
+  register: test3
+  ignore_errors: true
+# test arp entry on lan interface
+- name: TEST 4.0 - Test if ARP < 3  entries on Client vrf (vManage vpn 12)
+  cisco.ios.ios_command:
+    commands:
+      - show ip arp vrf 12
+  register: arp_output
+- name: TEST 4.1 - Parse ARP output and set fact device_neighbors
+  ansible.builtin.set_fact:
+    device_neighbors: "{{ arp_output.stdout[0] | parse_cli_textfsm(ntc_templates+'/cisco_ios_show_ip_arp_vrf.textfsm') }}"
+
+# TEST GPR Latency
+- name: TEST 100 - Test reachability and latency to GPR (STH) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.15.64
+    vrf: "5"
+  register: ping_sth_gpr_b
+  ignore_errors: true
+- name: TEST 105 - Test reachability and latency to GPR (HKG) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.159.64
+    vrf: "5"
+  register: ping_hkg_gpr_b
+  ignore_errors: true
+- name: TEST 110 - Test reachability and latency to GPR (SEC) rotuer in MGMT vrf (vManage vpn 5)
+  cisco.ios.ios_ping:
+    dest: 10.0.79.64
+    vrf: "5"
+  register: ping_sec_gpr_b
+  ignore_errors: true

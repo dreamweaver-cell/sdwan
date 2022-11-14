@@ -1,0 +1,29 @@
+---
+- name: Delete interface index file on ISR
+  hosts: sdwan
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+
+  tasks:
+    - name: Find indexfile To Remove
+      cisco.ios.ios_command:
+        commands: "dir nvram: | i GE_"
+      register: delete_index
+
+    - ansible.builtin.set_fact:
+        indexfile: "{{ delete_index.stdout | regex_search('ISR\\S*[0-9]_[0-9]') }}"
+
+    - name: Delete index file
+      cisco.ios.ios_command:
+        commands:
+          - command: "delete /force nvram:{{ indexfile }}"
+      when: indexfile
+
+    - ansible.builtin.set_fact:
+        indexfile: "{{ delete_index.stdout | regex_search('C1\\S*[0-9]_[0-9]') }}"
+
+    - name: Delete index file
+      cisco.ios.ios_command:
+        commands:
+          - command: "delete /force nvram:{{ indexfile }}"
+      when: indexfile

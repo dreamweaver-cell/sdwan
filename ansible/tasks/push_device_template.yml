@@ -1,0 +1,21 @@
+---
+- name: Read template
+  ansible.builtin.set_fact:
+    deviceTemplate: "{{ lookup('file', template_file )}}"
+- ansible.builtin.set_fact:
+    deviceTemplates:
+      - "{{ deviceTemplate }}"
+- name: Remove old device template to vManage
+  vmanage_device_template:
+    user: "{{ vmanage_user }}"
+    host: "{{ vmanage_host }}"
+    password: "{{ vmanage_password }}"
+    state: absent
+    aggregate: "{{ deviceTemplates }}"
+- name: Import device template to vManage
+  vmanage_device_template:
+    user: "{{ vmanage_user }}"
+    host: "{{ vmanage_host }}"
+    password: "{{ vmanage_password }}"
+    state: present
+    aggregate: "{{ deviceTemplates }}"

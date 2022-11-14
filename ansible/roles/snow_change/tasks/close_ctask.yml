@@ -1,0 +1,14 @@
+---
+- name: Closing task {{ item }}
+  servicenow.servicenow.snow_record:
+    state: present
+    table: change_task
+    username: "{{ sn_username }}"
+    password: "{{ sn_password }}"
+    instance: "{{ sn_instance }}"
+    number: "{{ item }}"
+    data:
+      close_notes: "{{ sat_note | default('') }}"
+      close_code: "{{ sat_code | default('successful') }}"
+      state: "{{ SN_CLOSE }}"
+  delegate_to: localhost

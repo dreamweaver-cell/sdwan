@@ -1,0 +1,58 @@
+{
+    "generalTemplates": [
+        {
+            "templateName": "PROD-AAA-{{ region|upper }}",
+            "templateType": "cedge_aaa"
+        },
+        {
+            "templateName": "Factory_Default_Cisco_BFD_Template",
+            "templateType": "cisco_bfd"
+        },
+        {
+            "templateName": "PROD-EDGE-OMP-{{ region|upper }}",
+            "templateType": "cisco_omp"
+        },
+        {
+            "templateName": "Factory_Default_Cisco_Security_Template",
+            "templateType": "cisco_security"
+        },
+        {
+            "templateName": "PROD-EDGE-SYSTEM-GPS-V2",
+            "templateType": "cisco_system",
+            "subTemplates": [
+                {
+                    "templateName": "PROD-LOGGING",
+                    "templateType": "cisco_logging"
+                },
+                {
+                    "templateName": "PROD-EDGE-NTP-{{ region|upper }}",
+                    "templateType": "cisco_ntp"
+                }
+            ]
+        },
+        {
+            {% if "CSR1000v" in viptela_type %}
+            "subTemplates": [
+                {
+                    "templateName": "PROD-EDGE-LAN-PORT",
+                    "templateType": "cisco_vpn_interface"
+                }
+            ],
+            {% endif %}
+            "templateName": "PROD-COMPUTE-VPN20",
+            "templateType": "cisco_vpn"
+        },
+        {
+            "templateName": "PROD-GLOBAL",
+            "templateType": "cedge_global"
+        },
+        {
+            "templateName": "PROD-SNMP",
+            "templateType": "cisco_snmp"
+        },
+        {
+            "templateName": "PROD-BANNER",
+            "templateType": "cisco_banner"
+        }
+    ]
+}

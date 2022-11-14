@@ -1,0 +1,33 @@
+---
+# Ansible Playbook to change to controller mode
+
+- name: Change To Controller Mode
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Copy Running Config
+      cisco.ios.ios_command:
+        commands:
+        - command: 'delete bootflash:ciscortr.cfg'
+          prompt: 'Delete filename \[ciscortr.cfg\]\?'
+          answer: "y"
+
+    - name: Copy Running Config
+      cisco.ios.ios_command:
+        commands:
+          - command: 'copy running-config bootflash:ciscortr.cfg'
+            prompt: 'Destination filename \[ciscortr.cfg\]\?'
+            answer: "\r"
+
+    - name: Change To Controller Mode
+      vars:
+        ansible_command_timeout: 120
+        ansible_connection: ansible.netcommon.network_cli
+      cisco.ios.ios_command:
+        commands: 
+          - command: 'controller-mode enable'
+            prompt: 'Continue\? \[confirm\]'
+            answer: "\r"
+      timeout: 120

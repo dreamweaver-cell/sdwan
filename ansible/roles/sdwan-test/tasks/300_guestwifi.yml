@@ -1,0 +1,18 @@
+---
+# TEST 1
+
+- name: TEST 300 GuestWifi -SUB TASK - Test reachability TO internet
+  block:
+    - cisco.ios.ios_ping:
+        dest: 8.8.8.8
+        vrf: '900'
+      register: zscaler_vrf900_to_inet
+  rescue:
+  - name: WARNING - Communicstion Error Detected on vpn900 to internet
+    ansible.builtin.debug:
+      msg: "client test_300 faild"
+
+# Result
+- ansible.builtin.set_fact:
+    test_result:
+      "{{ test_result + [{ 'severity':'critical', 'description':'Test GuestWifi vpn900 to Google DNS', 'name':'test_300', 'successful': not zscaler_vrf900_to_inet['failed'] }] }}"

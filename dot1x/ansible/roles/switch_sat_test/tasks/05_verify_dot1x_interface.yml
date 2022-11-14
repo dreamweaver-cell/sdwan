@@ -1,0 +1,13 @@
+---
+#TEST 1 & 2
+- name: "TEST 05 test dot1x authenticated clientsP"
+  cisco.ios.ios_command:
+    commands:
+      - show dot1x all summary
+  register: dot1x_auth
+
+- name: "TEST 05 register output of authenticated clients"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'critical', 'description':'test if clients are authenticated', 'name':'test_05', 'successful': 'AUTH' in dot1x_auth.stdout }] }}"

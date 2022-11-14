@@ -1,0 +1,46 @@
+---
+# Ansible Playbook to test SDWAN routers.
+
+- name: Test SDWAN routers
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+  vars:
+    critical_alarm: false
+    warning_alarm: false
+
+  tasks:
+    # Verify that the router is migrated to SDWAN
+    - name: check if migrated
+      cisco.ios.ios_command:
+        commands: show ip vrf
+      register: output
+      failed_when: "'MGMT' in output.stdout[0]"
+
+    - name: Get SDWAN services
+      ansible.builtin.import_role:
+        name: sdwan-test
+      vars:
+        - sdwan_services: "{{ sdwan.services.keys()|list }}"
+
+    - name: Build test resultss
+      ansible.builtin.set_fact:
+        alarm_msg:
+            "{{ alarm_msg | default([]) + [ item ] }}"
+        critical_alarm: true
+      when: not item.successful and item.severity == 'critical'
+      loop: "{{ test_result }}"
+
+    - name: Build warning test resultss
+      ansible.builtin.set_fact:
+        alarm_msg:
+            "{{ alarm_msg | default([]) + [ item ] }}"
+        warning_alarm: true
+      when: not item.successful and item.severity == 'warning'
+      loop: "{{ test_result }}"
+
+    - name: Notify on errors
+      ansible.builtin.include_role:
+        name: notify
+        tasks_from: provision_error.yml
+      when: critical_alarm or warning_alarm

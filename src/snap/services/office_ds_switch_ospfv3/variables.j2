@@ -1,0 +1,33 @@
+{
+    {% if "ISR4" in part_number %}
+          {% set vlanid = "" %}
+          {% for subinterface in services.office_ds_switch_ospfv3.interfaces %}
+               {% set vlanid = subinterface.split(".") %}
+               "vlan{{ vlanid[1] }}_sub_if_name" : "{{ subinterface }}",
+               "vlan{{ vlanid[1] }}_sub_if_description" : "{{ interfaces.get(subinterface).description }}",
+               "vlan{{ vlanid[1] }}_ipv4_address" : "{{ interfaces.get(subinterface).ipv4 }}"
+               {# OSPFv3 configuration #}
+               {% if "3901" in vlanid[1] %}
+                    ,"ospf_lan_interface" : "{{ subinterface }}",
+                    "ospf_lan_cost" : "10",
+                    "ospf_originate_metric" : "1"
+               {% endif %}
+               {% if "3902" in vlanid[1] %}
+                    ,"ospf_lan_interface" : "{{ subinterface }}",
+                    "ospf_lan_cost" : "100",
+                    "ospf_originate_metric" : "100"
+               {% endif %}
+                {% if "3907" in vlanid[1] %}
+                    ,"ospf_client_interface" : "{{ subinterface }}",
+                    "ospf_client_cost" : "10",
+                    "ospf_originate_metric" : "1"
+               {% endif %}              
+               {% if "3908" in vlanid[1] %}
+                    ,"ospf_client_interface" : "{{ subinterface }}",
+                    "ospf_client_cost" : "100",
+                    "ospf_originate_metric" : "100"
+               {% endif %}
+               {{ "," if not loop.last }}
+          {% endfor %}
+    {% endif %}
+}

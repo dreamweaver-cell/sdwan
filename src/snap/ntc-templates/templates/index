@@ -1,0 +1,11 @@
+Template, Hostname, Platform, Command
+cisco_xe_show_running-config_static_routes.textfsm, .*, cisco_xe, sh[[ow]] ru[[nning-config]] \| i ip route
+cisco_xe_show_running-config_zscaler_tunnel.textfsm, .*, cisco_xe, sh[[ow]] ru[[nning-config]] interface tunnel
+cisco_xe_show_running-config_vpls_mac-addr.textfsm, .*, cisco_xe, sh[[ow]] ru[[nning-config]] interface
+cisco_xe_show_interfaces_switchport.textfsm, .*, cisco_xe, sh[[ow]] interfaces switchport
+cisco_xe_show_crypto_pki_certificates_CISCO_IDEVID_SUDI.textfsm, .*, cisco_xe, sh[[ow]] crypto pki certificates CISCO_IDEVID_SUDI
+cisco_xe_show_voice_port_summary.textfsm, .*, cisco_xe, sh[[ow]] voice port summary
+cisco_xe_show_license_feature.textfsm, .*, cisco_xe, sh[[ow]] license feature
+cisco_ios_show_ip_arp_vrf.textfsm, .*, cisco_xe, sh[[ow]] ip arp vrf (\S*)
+cisco_xe_show_voice_vrf.textfsm, .*, cisco_xe, sh[[ow]] voice vrf
+cisco_xe_show_voice_vrf.textfsm, .*, cisco_xe, sh[[ow]] ru[[nning-config]] \| inc voice vrf

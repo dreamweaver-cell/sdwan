@@ -1,0 +1,11 @@
+/* Set black background color, white text and some padding */
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 15px;
+    background-color: #686868;
+    color: white;
+    text-align: right;
+}

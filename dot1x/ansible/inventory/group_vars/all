@@ -1,0 +1,35 @@
+---
+
+ansible_connection: network_cli
+use_proxy: no
+vmanage_user: "{{ lookup('env','TACACS_USERNAME') }}"
+vmanage_password: "{{ lookup('env','TACACS_PASSWORD') }}"
+sn_username: "{{ lookup('env','SN_USERNAME') }}"
+sn_password: "{{ lookup('env','SN_PASSWORD') }}"
+organization: "SDWAN - 464334"
+vmanage_host: vmanage-2041445.sdwan.cisco.com
+ntc_templates: "{{ lookup('env','SNAPCONF_DIR')+'/../src/snap/ntc-templates/templates/' }}"
+ansible_network_os: cisco.ios.ios
+ansible_user: "{{ lookup('env','TACACS_USERNAME') }}"
+ansible_password: "{{ lookup('env','TACACS_PASSWORD') }}"
+
+upgrade_ios_version: V173_5_CSCWA49721_2
+ftp_server_ip: 10.61.95.134
+
+snapconfig_dir: "{{ lookup('env','SNAPCONF_DIR') | default(playbook_dir+'/../data/snapconfig/', True) }}"
+runnconfig_dir: "{{ lookup('env','RUNCONF_DIR') | default(playbook_dir+'/../data/runningconfig/', True) }}"
+
+migration_webhook: "https://hennesandmauritz.webhook.office.com/webhookb2/7a66d405-6e16-4e2e-ac07-626598f493e0@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/8a89a0383c5a4304b63c422306ac18f4/35401d6c-6634-4b83-8740-9cff92db990a"
+sandladan: "https://hennesandmauritz.webhook.office.com/webhookb2/7a66d405-6e16-4e2e-ac07-626598f493e0@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/ba782dba25f840c7a759234d62e77232/8ba79cf8-1905-459b-b093-561a34ee4eb0"
+operations_webhook: "https://hennesandmauritz.webhook.office.com/webhookb2/9cfe597d-2750-46a1-8d5e-4747f4b90348@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/f3d303b5ee6e4d0f90a682d0643d7a51/35401d6c-6634-4b83-8740-9cff92db990a"
+general_webhook: "https://hennesandmauritz.webhook.office.com/webhookb2/7a66d405-6e16-4e2e-ac07-626598f493e0@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/4e7395b308bf400da222196558611db3/fc98a7dc-dd9c-403d-a89d-ca2040f017d9"
+snap_alarms: "https://hennesandmauritz.webhook.office.com/webhookb2/7a66d405-6e16-4e2e-ac07-626598f493e0@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/9482e8b0bf114710b4d8a2ee1f066999/8ba79cf8-1905-459b-b093-561a34ee4eb0"
+devops_channel: "https://hennesandmauritz.webhook.office.com/webhookb2/688c4ca5-47cc-4fd4-9ca8-e677516d7166@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/6f1add3128be4aecbc11a74e01f68658/fc98a7dc-dd9c-403d-a89d-ca2040f017d9"
+
+devops_channel_dot1x: https://hennesandmauritz.webhook.office.com/webhookb2/7a66d405-6e16-4e2e-ac07-626598f493e0@30f52344-4663-4c2e-bab3-61bf24ebbed8/IncomingWebhook/8e68ab1316cb4e08a5317665b5c4c948/fc98a7dc-dd9c-403d-a89d-ca2040f017d9
+
+# Initialize variables
+
+validate_connectivity: ""
+validate_configuration: ""
+validate_routes: ""

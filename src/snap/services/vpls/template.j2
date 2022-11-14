@@ -1,0 +1,17 @@
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-VPN0-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+			"templateName": "PROD-EDGE-VPLS-{{ 'R2-' if redundant_router_type == 'sec' }}STATIC-{{ region|upper }}",
+			"templateType": "cisco_vpn_interface"
+		}
+		{% if vpls_sub_int %}
+		,{
+			"templateName": "PROD-EDGE-VPLS-PARENT-INTERFACE",
+			"templateType": "cisco_vpn_interface"
+		}
+		{% endif %}
+		]
+	}]
+}

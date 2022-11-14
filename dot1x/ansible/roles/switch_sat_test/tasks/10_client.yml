@@ -1,0 +1,46 @@
+---
+
+# TEST 1
+  - name: TEST 10 client - Test reachability and latency to GPR (STH) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.0.15.64
+        register: ping_sth_gpr_b
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client
+        ansible.builtin.debug:
+          msg: "client test_55 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to STH', 'name':'test_55', 'successful': not ping_sth_gpr_b['failed'] }] }}"
+
+# TEST 2
+  - name: TEST 20 client - Test reachability and latency to GPR (HKG) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.0.159.64
+        register: ping_hkg_gpr_b
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client
+        ansible.builtin.debug:
+          msg: "client test_60 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to HKG', 'name':'test_60', 'successful': not ping_hkg_gpr_b['failed'] }] }}"
+
+ # TEST 3
+  - name: TEST 30 client - Test reachability and latency to GPR (SEC) rotuer in client vrf (vManage vpn 5)
+    block:
+      - cisco.ios.ios_ping:
+          dest: 10.0.79.64
+        register: ping_sec_gpr_b
+    rescue:
+      - name: WARNING - Communicstion Error Detected on client
+        ansible.builtin.debug:
+          msg: "client test_65 faild"
+# Result
+  - ansible.builtin.set_fact:
+      test_result:
+        "{{ test_result + [{ 'severity':'critical', 'description':'Test client vpn12 to SEC', 'name':'test_65', 'successful': not ping_sec_gpr_b['failed'] }] }}"

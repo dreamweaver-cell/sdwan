@@ -1,0 +1,3 @@
+regional_dhcp_helper: "10.61.95.125,10.61.95.126"
+regional_sccm_helper: "10.64.15.211,10.60.15.212"
+ftp_server_ip: 10.61.95.134

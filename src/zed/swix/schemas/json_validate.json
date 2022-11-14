@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "properties": {
+      "serial": {
+        "type": "string"
+      },
+      "interfaces": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "uniqueItems": true,
+          "additionalProperties": true,
+          "required": [
+            "name",
+            "duplex",
+            "speed"
+          ]
+        }
+      },
+      "uplinks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "uniqueItems": true,
+          "additionalProperties": true,
+          "required": [
+            "interfaces",
+            "name"
+          ]
+        }
+      },
+      "services": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "uniqueItems": true,
+          "additionalProperties": true,
+          "required": [
+            "id",
+            "name",
+            "enabled",
+            "interfaces"
+          ]
+        }
+      }  
+    },
+    "required": [
+      "interfaces",
+      "serial",
+      "services",
+      "uplinks",
+      "ip_address"
+    ]
+  }

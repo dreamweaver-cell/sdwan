@@ -1,0 +1,12 @@
+---
+- name: Notify teams channel
+  hosts: sdwan
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "{{ msg }}"
+        hooks:
+          - "{{ migration_webhook }}"

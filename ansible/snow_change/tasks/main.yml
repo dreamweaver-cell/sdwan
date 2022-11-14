@@ -1,0 +1,17 @@
+---
+# tasks file for snow_change
+- name: Check that network_change variable is set to create or close
+  ansible.builtin.fail:
+    msg: "you must define network_change: create/close"
+  when: network_change is not defined
+  run_once: true
+
+- name: Creating SR Change
+  include: change_task_create.yml
+  when: network_change == "create"
+  run_once: true
+
+- name: Closing SR Change
+  include: change_task_close.yml
+  when: network_change == "close"
+  run_once: true

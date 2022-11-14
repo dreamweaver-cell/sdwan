@@ -1,0 +1,190 @@
+---
+# Ansible Playbook to upgrade Cisco IOS
+
+- name: Upgrade CISCO IOS
+  hosts: sdwan
+  gather_facts: false
+  connection: local
+
+  tasks:
+    # Pre-checks
+
+    - name: Check Current Version
+      cisco.ios.ios_facts:
+        gather_subset: hardware
+
+    - ansible.builtin.debug:
+        msg:
+          - "Current version is {{ ansible_net_version }}"
+          - "Upgrade image is {{ upgrade_ios_version }}"
+
+    - name: Stop Play If Image Version Is Correct
+      ansible.builtin.meta: end_host
+      when: upgrade_ios_version == ansible_net_version
+
+    - ansible.builtin.debug:
+        msg: "Image is not compliant and will be upgraded"
+      when: ansible_net_version != upgrade_ios_version
+
+    - name: Ping Check To Ftp
+      cisco.ios.ios_command:
+        commands: ping vrf MGMT "{{ ftp_server_ip }}"
+      register: ftp_ping_check
+
+    # Chose correct IOS
+
+    - name: Report Unreachable
+      ansible.builtin.fail:
+        msg: "Ping test to ftp server {{ ftp_server_ip }} failed"
+      when: ftp_ping_check.stdout[0].find("Success rate is 0 percent") != -1
+
+    - name: Set ISR4300 Image
+      ansible.builtin.set_fact:
+        new_image: isr4300-universalk9.{{ upgrade_ios_version }}.SPA.bin
+      when: ansible_net_model is regex('ISR43[1-5]{2}')
+
+    - name: Set ISR4400 Image
+      ansible.builtin.set_fact:
+        new_image: isr4400-universalk9.{{ upgrade_ios_version }}.SPA.bin
+      when: ansible_net_model is regex('ISR44[1-5]{2}')
+
+    - name: Set C1100 Image
+      ansible.builtin.set_fact:
+        new_image: c1100-universalk9.{{ upgrade_ios_version }}.SPA.bin
+      when: ansible_net_model is regex('C1111-4|8p*')
+
+    # Clean flash
+
+    - name: Find File To Remove
+      cisco.ios.ios_command:
+        commands: "dir *.bin | e {{ ansible_net_version }}"
+      register: delete_files
+
+    - name: Delete Bin files
+      cisco.ios.ios_command:
+        commands:
+          - command: "delete /force bootflash:{{ item }}"
+      with_items: "{{ delete_files.stdout_lines[0] | string | regex_findall('(?<!\\S)[\\w.-]+\\.bin\\b') }}"
+
+    - name: Clean Packages
+      vars:
+        ansible_command_timeout: 3600
+      cisco.ios.ios_command:
+        commands:
+          - command: "request platform software package clean pattern bootflash:"
+            prompt:
+              - 'Do you want to proceed\?'
+            answer:
+              - "y"
+        # timeout: 600
+        wait_for: result[0] contains SUCCESS
+
+    - name: Update the facts
+      ansible.builtin.setup:
+        gather_subset:
+          - "!all"
+          - "hardware"
+
+    - name: Free Space Check Fails
+      ansible.builtin.assert:
+        that:
+          - ansible_net_filesystems_info['bootflash:'].spacefree_kb > 1000000
+
+    # Upload and verify image
+
+    - name: Check Image Is Already Exist In Bootflash
+      cisco.ios.ios_command:
+        commands: "dir bootflash: | include {{ new_image }}"
+      register: check_image
+
+    - name: set ftp source interface
+      cisco.ios.ios_config:
+        lines:
+          - ip ftp source-interface Loopback5
+
+    - name: Fetch New Image To Bootflash
+      vars:
+        ansible_command_timeout: 3600
+      cisco.ios.ios_command:
+        commands:
+          - command: "copy ftp://{{ ftp_server_ip }}/iosxe/{{ new_image }} bootflash:"
+            prompt: 'Destination filename \[{{ new_image }}\]'
+            answer: "\r"
+        # timeout: 3600
+        wait_for: result[0] contains OK
+      when: check_image.stdout[0].find(new_image)  == -1
+
+    - name: Verify Image File
+      vars:
+        ansible_command_timeout: 1200
+      cisco.ios.ios_command:
+        commands: "verify bootflash:/{{ new_image }}"
+        # timeout: 1200
+      register: image_verification_results
+
+    - name: Set image_integrity_check to pass/fail
+      ansible.builtin.set_fact:
+        image_integrity_check: "pass"
+      when: image_verification_results.stdout[0].find('Digital signature successfully verified') != -1
+
+    - name: Fail Task If Image Integrity Check Fails
+      ansible.builtin.fail:
+        msg: "Image Integrity Check Fails. Please check the uploaded image!"
+      when: image_verification_results.stdout[0].find('Digital signature successfully verified') == -1
+
+    # Change boot variables
+
+    - name: Check Bootvar Before
+      cisco.ios.ios_command:
+        commands: show bootvar
+      register: bootvar_old
+
+    - name: Delete All Entries In The Bootable Image List
+      cisco.ios.ios_config:
+        lines: no boot system
+
+    - name: Load New IOS After Next Reload
+      cisco.ios.ios_config:
+        lines: "boot system bootflash:/{{ new_image }}"
+
+    - name: Enable Telnet
+      cisco.ios.ios_config:
+        lines:
+          - line vty 0 15
+          - transport input all
+
+    - name: Updates GRUB Menu List Of Images Available In Bootflash
+      vars:
+        ansible_command_timeout: 60
+      cisco.ios.ios_command:
+        commands:
+          - command: wr
+            prompt: "Building configuration..."
+            answer: '\r'
+        # timeout: 60
+
+    - name: Check Configuration Register Setting
+      cisco.ios.ios_command:
+        commands: show version
+
+    - name: Set Configuration Register
+      cisco.ios.ios_config:
+        lines: config-register 0x2102
+
+    - name: Copy Running Configuration To Startup Configuration
+      cisco.ios.ios_command:
+        commands:
+          - command: copy running-config startup-config
+            prompt: 'Destination filename \[startup-config\]'
+            answer: "\r"
+
+    - name: Check New Bootvar
+      cisco.ios.ios_command:
+        commands: show bootvar
+      register: bootvar_new
+
+    - name: Verify Boot Imange Has Been Updated
+      ansible.builtin.fail:
+        msg: "Bootvar was not updated {{ bootvar_new.stdout_lines[0][0] }}"
+      when:
+        - bootvar_old.stdout_lines[0][0] == bootvar_new.stdout_lines[0][0]

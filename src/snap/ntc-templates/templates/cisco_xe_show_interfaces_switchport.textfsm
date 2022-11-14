@@ -1,0 +1,14 @@
+Value INTERFACE_NAME (\S*)
+Value INTERFACE_ENABLED (\S*)
+Value INTERFACE_PORT_MODE (\w+\s\w+|\w+)
+Value INTERFACE_VLAN (\S*)
+Value INTERFACE_VOICE_VLAN (\S*)
+Value NATIVE_VLAN (\d+)
+
+Start
+  ^Name:\s+${INTERFACE_NAME}
+  ^Switchport:\s+${INTERFACE_ENABLED}
+  ^Administrative\s*Mode:\s+${INTERFACE_PORT_MODE}
+  ^Access\s*Mode\s*VLAN:\s+${INTERFACE_VLAN}
+  ^Voice\s*VLAN:\s+${INTERFACE_VOICE_VLAN}
+  ^Trunking\s*Native\s*Mode\s*VLAN:\s+${NATIVE_VLAN}\s.* -> Record

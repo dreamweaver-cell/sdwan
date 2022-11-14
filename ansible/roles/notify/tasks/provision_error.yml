@@ -1,0 +1,12 @@
+---
+- name: Notify teams on error
+  community.general.office_365_connector_card:
+    webhook: "{{ item }}"
+    text: "{{ lookup('template', templ | default('notify_error.j2', True) ) }}"
+    color: "{{ color | default('EE0000') }}"
+  vars:
+    summary: "{{ inventory_hostname }} provision ERROR"
+  delegate_to: localhost
+  loop:
+    - "{{ snap_alarms }}"
+  ignore_errors: true

@@ -1,0 +1,107 @@
+---
+- block:
+    - name: INCLUDE CHANGE VARIABLES
+      ansible.builtin.include_vars: change_request_update_vars.yml
+    - ansible.builtin.set_fact:
+        sn_start_date: '{{lookup(''pipe'',''date -u +%Y-%m-%d" "%H:%M:00'')}}'
+        sn_end_date: '{{lookup(''pipe'',''date -u -d "+1 hour" +%Y-%m-%d" "%H:%M:00'')}}'
+
+    - name: CREATING SERVICE-NOW CHANGE
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        data:
+          short_description: "{{ sn_short_description }}"
+          description: "{{ sn_description }}"
+          justification: "{{ sn_justification }}"
+          implementation_plan: "{{ sn_implementation_plan }}"
+          risk_impact_analysis: "{{ sn_risk_impact_analysis }}"
+          backout_plan: "{{ sn_backout_plan }}"
+          test_plan: "{{ sn_test_plan }}"
+          assignment_group: "{{ sn_assignment_group }}"
+          assigned_to: "{{ sn_assigned_to }}"
+          risk: "{{ sn_risk }}"
+          severity: "{{ sn_severity }}"
+          priority: "{{ sn_priority }}"
+          business_service: "{{ sn_business_service }}"
+          service_offering: "{{ sn_service_offering }}"
+          cmdb_ci: "{{ sn_cmdb_ci }}"
+          start_date: "{{ sn_start_date }}"
+          end_date: "{{ sn_end_date }}"
+      register: sn_change
+    - ansible.builtin.debug:
+        msg: "{{sn_change.record['number']}}"
+
+    - name: CREATING TASK FOR CHANGE
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_task
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        data:
+          parent: "{{ sn_change['record']['number'] }}"
+          change_request: "{{ sn_change['record']['number'] }}"
+          short_description: "{{ sn_short_description }}"
+          description: "{{ sn_description }}"
+          business_service: "{{ sn_business_service }}"
+          service_offering: "{{ sn_service_offering }}"
+          cmdb_ci: "{{ sn_cmdb_ci }}"
+          planned_start_date: "{{ sn_start_date }}"
+          planned_end_date: "{{ sn_end_date }}"
+          change_task_type: "implementation"
+      register: sn_task
+    - ansible.builtin.debug:
+        msg: " {{ sn_task.record['number'] }}"
+
+    - name: SEND CHANGE FOR APPROVAL
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change.record['number']}}"
+        data:
+          state: "-4"
+
+    #          - name: CHANGE APPROVED
+    #            servicenow.servicenow.snow_record:
+    #              state: present
+    #              table: change_request
+    #              username: "{{ sn_username }}"
+    #              password: "{{ sn_password }}"
+    #              instance: "{{ sn_instance }}"
+    #              number: "{{ sn_change.record['number']}}"
+    #              data:
+    #                state: "-3"
+
+    - name: SCHEDULE CHANGE
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change.record['number']}}"
+        data:
+          state: "-2"
+
+    - name: SET CHANGE TO IMPLEMENT
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change.record['number']}}"
+        data:
+          state: "-1"
+    - ansible.builtin.set_fact:
+        sn_change_1: "{{sn_change}}"
+        sn_task_1: "{{sn_task}}"
+  run_once: true
+  delegate_to: localhost

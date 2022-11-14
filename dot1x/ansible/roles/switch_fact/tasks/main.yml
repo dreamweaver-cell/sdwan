@@ -1,0 +1,4 @@
+---
+# tasks file for switch_fact
+- name: Run post-tests verify sdwan controllers
+  ansible.builtin.include: mac.yml

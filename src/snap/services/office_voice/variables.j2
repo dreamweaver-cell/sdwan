@@ -1,0 +1,6 @@
+{
+    {% if "Loopback10" in services.office_voice.interfaces %}
+    "lo10_ipv4_address" : "{{ interfaces.get("Loopback10").ipv4 }}"
+    {% endif %}
+
+}

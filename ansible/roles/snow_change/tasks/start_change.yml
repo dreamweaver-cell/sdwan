@@ -1,0 +1,14 @@
+- name: Initiating service-now process
+  block:
+    # Move Change to implement
+    - name: Move change {{ sn_change_nr }} push change to implement
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change_nr }}"
+        data:
+          state: "{{ item }}"
+      loop: "[{{ SN_IMPLEMENT: }}]"

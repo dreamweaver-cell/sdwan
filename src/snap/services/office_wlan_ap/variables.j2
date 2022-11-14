@@ -1,0 +1,14 @@
+{# Provisioning template wlan_ap v1.0 #}
+
+{
+    {% if "C1111" in part_number %}
+          {% if wlan_if_shutdown is defined and wlan_if_shutdown %}
+               wlan_if_shutdown : "true"
+          {% else %}
+               wlan_if_shutdown : "false"
+          {% endif %}
+    {% endif %}
+
+}
+
+  

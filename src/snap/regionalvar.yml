@@ -1,0 +1,13 @@
+---
+emea:
+     regional_dhcp_helper: "10.61.95.125,10.61.95.126"
+     vpls_sdwanpop1_ip: 10.0.0.3
+     vpls_sdwanpop2_ip: 10.0.0.4
+amer:
+     regional_dhcp_helper: "10.70.93.7,10.70.93.8,10.61.95.23"
+     vpls_sdwanpop1_ip: 10.0.64.3
+     vpls_sdwanpop2_ip: 10.0.64.4
+apac:
+     regional_dhcp_helper: "10.0.152.150,10.0.152.151"
+     vpls_sdwanpop1_ip: 10.0.144.3
+     vpls_sdwanpop2_ip: 10.0.144.4

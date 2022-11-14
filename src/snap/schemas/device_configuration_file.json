@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://json-schema.org/draft-06/schema#",
+  "definitions": {
+    "interface_vars": {
+      "type": "object",
+      "properties": {
+        "auto_negotiate": {
+          "type": "boolean"
+        },
+        "bandwidth": {
+          "type": "number"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "mtu": {
+          "type": "number",
+          "maximum": 1562,
+          "minimum": 1400
+        },
+        "port_channel": {
+          "type": "object"
+        },
+        "ipv4": {
+          "type": "string",
+          "$ref": "#/definitions/ipv4address"
+        },
+        "vrf": {
+          "type": "string",
+          "$ref": "#/definitions/vrf"
+        },
+        "phys_address": {
+          "type": "string"
+        },
+        "port_speed": {
+          "type": "string"
+        }
+      }
+    },
+    "routing_vars": {
+      "type": "object",
+      "required": [
+        "ipv4",
+        "ipv4_mask",
+        "nexthop_ip"
+      ],
+      "properties": {
+        "ipv4": {
+          "type": "string",
+          "$ref": "#/definitions/ipv4"
+        },
+        "ipv4_mask": {
+          "type": "string",
+          "$ref": "#/definitions/ipv4"
+        },
+        "vrf": {
+          "type": "string",
+          "$ref": "#/definitions/vrf"
+        },
+        "nexthop_ip": {
+          "type": "string",
+          "$ref": "#/definitions/ipv4"
+        },
+        "nexthop_if": {
+          "type": "string"
+        }
+      }
+    },
+    "ipv4": {
+      "pattern": "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$"
+    },
+    "ipv4address": {
+      "pattern": "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}$|dhcp_negotiated"
+    },
+    "vrf": {
+      "pattern": "Mgmt-intf|INTERNET-A|INTERNET_A|MGMT|lan|guest|flowscape|ATEASCREEN|machines2|vpn0|vpn5|vpn10|vpn12|vpn20|vpn900|vpn30|^[A-Z][A-Z][A-Z]-CLIENT$"
+    }
+  },
+  "properties": {
+    "interfaces": {
+      "patternProperties": {
+        "^(.*)$": {
+          "type": "object",
+          "$ref": "#/definitions/interface_vars"
+        }
+      }
+    },
+    "services": {
+      "type": "object"
+    },
+    "routing": {
+      "type": "object",
+      "properties": {
+        "static": {
+          "type": "array",
+          "maxItems": 11,
+          "items": {
+            "$ref": "#/definitions/routing_vars"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "device_name",
+    "part_number",
+    "device_serial_number",
+    "redundant_router_type"
+  ]
+}

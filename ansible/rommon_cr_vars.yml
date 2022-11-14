@@ -1,0 +1,23 @@
+changefunction: "SDWAN Migration project"
+sn_instance: hm
+
+# DESCRIPTION
+sn_short_description: "ROMMON upgrade on {{ inventory_hostname }}"
+sn_description: "This is a task has been created by SNAP"
+sn_justification: "This upgrade is part of the SDWAN project and maintained by Global Connectivity team "
+sn_implementation_plan: "SNAP will upgrade ROMMON and reload the router"
+sn_risk_impact_analysis: "This migration has planned downtime during software upgrade"
+sn_backout_plan: "Error messages will be sent to migration TEAMS channel, "
+sn_test_plan: "SAT tests will be executed after upgrade"
+
+# ASSIGNMENTS
+sn_assignment_group: "Infra Services - Network"
+sn_assigned_to: ""
+sn_business_service: "Core WAN - PROD"
+sn_service_offering: "Core WAN - PROD Automation - PROD_A S Off"
+sn_cmdb_ci: "Core WAN - PROD"
+
+# PLANNING
+sn_severity: 2
+sn_priority: 2
+sn_risk: 4

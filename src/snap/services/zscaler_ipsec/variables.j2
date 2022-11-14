@@ -1,0 +1,20 @@
+{
+    {% if not vlan927_sub_if_name is defined %}
+        {% if "C1111" in part_number %}
+              "vlan927_sub_if_name": "Vlan927",
+              "vlan928_sub_if_name": "Vlan928",
+        {% endif %}
+        {% if "ISR4" in part_number %}
+              "vlan927_sub_if_name": "{{ parent_lan_if_name }}.927",
+              "vlan928_sub_if_name": "{{ parent_lan_if_name }}.928",
+        {% endif %}
+        "vlan927_dhcp_helper": "{{ interfaces.get(vlan_interface).helper_address | join(',') | default(regional_dhcp_helper, true) }}",
+        "vlan927_pri_ipv4_address": "172.16.0.2/22",
+        "vlan927_sub_if_description": "**LIB_HM_WIFI_GUEST**",
+        "vlan927_vrrp_ipaddress": "172.16.0.1",
+        "vlan928_dhcp_helper": "{{ interfaces.get(vlan_interface).helper_address | join(',') | default(regional_dhcp_helper, true) }}",
+        "vlan928_pri_ipv4_address": "172.16.8.2/21",
+        "vlan928_sub_if_description": "**LIB_HM_WIFI_ACCESS**",
+        "vlan928_vrrp_ipaddress": "172.16.8.1"
+    {% endif %}
+}

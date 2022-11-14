@@ -1,0 +1,20 @@
+---
+- name: SNOW Change Rquest Close by username
+  become: false
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: search CTASK by user name
+      servicenow.servicenow.snow_record_find:
+        #table: change_task
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "hmdev"
+        query:
+          AND:
+            equals:
+              task_effective_number: "{{ change_nr }}"
+      register: result
+    - ansible.builtin.debug:
+       msg: "{{ result }}"

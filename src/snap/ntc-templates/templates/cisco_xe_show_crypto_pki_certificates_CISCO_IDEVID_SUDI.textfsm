@@ -1,0 +1,7 @@
+Value HEX_SERIAL ([0-9a-fA-F]{8})
+Value SERIAL_NR (\S*)
+
+Start
+  ^\s*Certificate\s*Serial\s*Number\s*\(hex\):\s+${HEX_SERIAL}
+  ^\s*Serial\s*Number:\sPID:(\S+)\s*SN:${SERIAL_NR}
+

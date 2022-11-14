@@ -1,0 +1,53 @@
+{# Provisioning template SBC Telefony service #}
+
+{# Hardware Cisco ISR 1k #}
+{% if "C1111" in part_number %}
+{
+	"generalTemplates": [
+		{% if vpn800_enabled %}
+		{
+			"templateName": "PROD-EDGE-FW-DMZ-VPN800",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-VLAN801-SVI-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		},
+		{% endif %}
+		{
+			"templateName": "PROD-EDGE-LAN-VPN101",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-VLAN101-SVI-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		}
+	]
+}
+{% endif %}
+
+{# Hardware Cisco ISR 4k #}
+{% if "ISR4" in part_number %}
+{
+	"generalTemplates": [
+		{% if vpn800_enabled %}
+		{
+			"templateName": "PROD-EDGE-FW-DMZ-VPN800",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-VLAN801-SUBINT-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		},
+		{% endif %}
+		{
+			"templateName": "PROD-EDGE-LAN-VPN101",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-VLAN101-SUBINT-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		}
+	]
+}
+{% endif %}

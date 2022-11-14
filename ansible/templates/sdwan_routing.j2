@@ -1,0 +1,16 @@
+"routing": {
+    "static": [
+        {%- if "zscaler" in router.services %}
+        {% include 'services/zscaler_routing.j2' %}
+        {% endif %}
+        {%- if router.services.internet.ipv4 != "dhcp_negotiated" %}
+        {
+            "vrf": "vpn0",
+            "ipv4": "0.0.0.0",
+            "ipv4_mask": "0.0.0.0",
+            "nexthop_if": "{{ internet_interface }}",
+            "nexthop_ip": "{{ router.services.internet.ipv4_gw }}"
+        }
+        {% endif %}
+    ]
+},

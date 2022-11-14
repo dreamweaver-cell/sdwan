@@ -1,0 +1,43 @@
+---
+
+
+# TEST 1
+- name: TEST 210 Zscaler - Test reachability TO internet (vrf 12)
+  block:
+    - cisco.ios.ios_ping:
+        dest: 8.8.8.8
+        vrf: '12'
+      register: zscaler_vrf12_to_inet
+  rescue:
+  - name: WARNING - Communicstion Error Detected on vpn12 to internet
+    ansible.builtin.debug:
+      msg: "client test_210 faild"
+
+# Result
+- ansible.builtin.set_fact:
+    test_result:
+      "{{ test_result + [{ 'severity':'critical', 'description':'Test Client vpn12 to Google DNS', 'name':'test_210', 'successful': not zscaler_vrf12_to_inet['failed'] }] }}"
+
+#TEST 2 & 3
+- name: "TEST 220 Check that tunnel loopback is up"
+  cisco.ios.ios_command:
+    commands:
+      - show endpoint-tracker | i Tunnel100050
+      - show endpoint-tracker | i Tunnel100051
+    wait_for:
+      - result[0] contains Tunnel100050
+      - result[1] contains Tunnel100051
+  register: ip_tunnel_interface
+
+- name: "TEST 220 Check that endpoint-tracker is up"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'warning', 'description':'Test 220 Check that endpoint-tracker is up', 'name':'test_220', 'successful': 'UP' in ip_tunnel_interface.stdout[0] }] }}"
+
+
+- name: "TEST 225 Check that endpoint-tracker is up"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'warning', 'description':'Test 225 Check that endpoint-tracker is up', 'name':'test_225', 'successful': 'UP' in ip_tunnel_interface.stdout[1] }] }}"

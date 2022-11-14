@@ -1,0 +1,32 @@
+---
+
+
+# TEST 1
+- name: TEST 155 VPLS - Test reachability and latency to GPR rotuer in vpn0
+  block:
+    - cisco.ios.ios_ping:
+        dest: "{{ sdwan.vpls_sdwanpop1_ip }}"
+      register: ping_sth_vpls_a
+  rescue:
+    - name: WARNING - Communicstion Error Detected on client vpn0
+      ansible.builtin.debug:
+        msg: "client test_155 faild"
+# Result
+- ansible.builtin.set_fact:
+    test_result:
+      "{{ test_result + [{ 'severity':'critical', 'description':'Test VPLS vpn0', 'name':'test_155', 'successful': not ping_sth_vpls_a['failed'] }] }}"
+
+# TEST 2
+- name: TEST 160 VPLS - Test reachability and latency to GPR rotuer in vpn0
+  block:
+    - cisco.ios.ios_ping:
+       dest:  "{{ sdwan.vpls_sdwanpop2_ip }}"
+      register: ping_hkg_vpls_b
+  rescue:
+    - name: WARNING - Communicstion Error Detected on client vpn0
+      ansible.builtin.debug:
+        msg: "client test_160 faild"
+# Result
+- ansible.builtin.set_fact:
+    test_result:
+      "{{ test_result + [{ 'severity':'critical', 'description':'Test VPLS vpn0', 'name':'test_160', 'successful': not ping_hkg_vpls_b['failed'] }] }}"

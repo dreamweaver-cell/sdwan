@@ -1,0 +1,81 @@
+Content-Type: multipart/mixed; boundary="===============4651535301009810767=="
+MIME-Version: 1.0
+
+--===============4651535301009810767==
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config"
+
+{% if sdwan.internet_if_ipv4_address is defined %}
+{% set wanif = sdwan.internet_if_name %}
+{% set wanaddr = sdwan.internet_if_ipv4_address | ansible.netcommon.ipv4('host/prefix') %}
+{% set nexthop = sdwan.vpn0_next_hop_ip_address %}
+{% else %}
+{% set wanif = sdwan.vpls_if_name %}
+{% set wanaddr = sdwan.vpls_if_ipv4_address | ansible.netcommon.ipv4('host/prefix') %}
+{% if sdwan.vpls_if_mac_address is defined %}
+{% set vplsmac = sdwan.vpls_if_mac_address %}
+{% endif %}
+{% if not sdwan.interfaces[sdwan.vpls_if_name].auto_negotiate %}
+{% set vplsfixedspeed = true %}
+{% endif %}
+{% set nexthop = sdwan.vpn0_next_hop_ip_address4 %}
+{% endif %}
+
+#cloud-config
+vinitparam:
+ - vbond : vbond-2041445.sdwan.cisco.com
+ - org : SDWAN - 464334
+ - otp : {{ sdwan.otp }}
+ - uuid : {{ sdwan.uuid }}
+
+--===============4651535301009810767==
+Content-Type: text/cloud-boothook; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="config-{{ sdwan.uuid }}.txt"
+
+#cloud-boothook
+  system
+   system-ip             {{ sdwan.system_system_ip }}
+   site-id               {{ sdwan.system_site_id}}
+   organization-name     "SDWAN - 464334"
+   vbond vbond-2041445.sdwan.cisco.com port 12346
+  !
+  sdwan
+   interface {{ wanif }}
+    tunnel-interface
+     encapsulation ipsec weight 1
+     color public-internet
+    exit
+   exit
+   !
+  hostname {{ sdwan.system_host_name }}
+  username admin privilege 15 secret admin
+  ip name-server {{ sdwan.dns_primary | default('8.8.8.8', true) }}
+  ip route 0.0.0.0 0.0.0.0 {{ nexthop }}
+  interface {{ wanif }}
+   no shutdown
+{% if sdwan.vpls_sub_int_encap is defined and sdwan.internet_if_ipv4_address is not defined %}
+   encapsulation dot1Q {{ sdwan.vpls_sub_int_encap }}
+{% endif %}
+   ip address {{ wanaddr | ansible.netcommon.ipaddr('address') }} {{ wanaddr | ansible.netcommon.ipaddr('netmask') }}
+{% if vplsmac is defined %}
+   mac-address {{ vplsmac }}
+{% endif %}
+{% if vplsfixedspeed is defined %}
+   speed 100
+   no negotiation auto
+{% endif %}
+  exit
+  interface Tunnel0
+   no shutdown
+   ip unnumbered {{ wanif }}
+   tunnel source {{ wanif }}
+   tunnel mode sdwan
+  exit
+!
+
+--===============4651535301009810767==--

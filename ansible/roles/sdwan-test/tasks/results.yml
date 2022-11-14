@@ -1,0 +1,14 @@
+---
+# tasks result file
+
+- ansible.builtin.debug:
+    msg: "Pre-tests completed"
+  when: run_pretest | default(false)
+
+- ansible.builtin.debug:
+    msg: "Migration tests completed"
+  when: pre_migration | default(false)
+
+- ansible.builtin.debug:
+    msg: "SAT acceptance tests completed"
+  when: not run_pretest and not pre_migration

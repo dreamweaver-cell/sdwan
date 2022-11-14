@@ -1,0 +1,18 @@
+{
+  "generalTemplates": [
+    {
+      "templateName": "PROD-EDGE-LAN-VPN10-V2",
+      "templateType": "cisco_vpn",
+      "subTemplates": [
+    {% set vlanid = "" %}
+    {% for subinterface in services.firewall.interfaces %}
+        {% set vlanid = subinterface.split(".")[1] %}
+        {
+          "templateName": "PROD-VLAN{{ vlanid }}-SUBINT-VRRP-{{redundant_router_type|upper}}",
+          "templateType": "cisco_vpn_interface"
+        }{{ "," if not loop.last }}
+    {% endfor %}
+      ]
+    }
+  ]
+}

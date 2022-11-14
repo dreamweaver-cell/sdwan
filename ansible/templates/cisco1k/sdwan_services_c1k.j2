@@ -1,0 +1,7 @@
+"lan": [
+    "Vlan927",
+    "Vlan928",
+    {% for lan_interfaces in router.services.lan -%}
+        "Vlan{{ lan_interfaces.vlan }}"{{ "," if not loop.last }}
+    {% endfor -%}
+    ],

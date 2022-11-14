@@ -1,0 +1,39 @@
+name: Build images
+
+on:
+  release:
+    types: [published, prereleased]
+  workflow_dispatch:
+  # push:
+  #   tags:
+  #     - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  ACR: netops.azurecr.io
+  REPO: netops.azurecr.io/sdwan
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "Docker login"
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          build-args: INDEX_URL=${{ secrets.PIP_EXTRA_INDEX_URL }}
+          push: true
+          tags: |
+            ${{ env.REPO }}:latest
+            ${{ env.REPO }}:${{ github.ref_name }}
+            ${{ env.REPO }}:${{ github.sha }}

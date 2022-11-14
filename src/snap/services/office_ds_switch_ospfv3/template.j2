@@ -1,0 +1,66 @@
+{# Provisioning template Atea screen v1.0 #}
+
+{# Hardware Cisco ISR 4k #}
+{# If router Primary router #}
+{% if redundant_router_type|upper == "PRI" %}
+{
+	"generalTemplates": [{
+			"templateName": "PROD-EDGE-LAN-VPN10-V2",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+					"templateName": "PROD-VLAN3901-SUBINT",
+					"templateType": "cisco_vpn_interface"
+				},
+				{
+					"templateName": "PROD-EDGE-LAN-OSPF",
+					"templateType": "cisco_ospfv3"
+				}
+			]
+		},
+		{
+			"templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+					"templateName": "PROD-VLAN3907-SUBINT",
+					"templateType": "cisco_vpn_interface"
+				},
+				{
+					"templateName": "PROD-EDGE-CLIENT-OSPF",
+					"templateType": "cisco_ospfv3"
+				}
+			]
+		}
+	]
+}
+{% endif %}
+{% if redundant_router_type|upper == "SEC" %}
+{
+	"generalTemplates": [{
+			"templateName": "PROD-EDGE-LAN-VPN10-V2",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+					"templateName": "PROD-VLAN3902-SUBINT",
+					"templateType": "cisco_vpn_interface"
+				},
+				{
+					"templateName": "PROD-EDGE-LAN-OSPF",
+					"templateType": "cisco_ospfv3"
+				}
+			]
+		},
+		{
+			"templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+					"templateName": "PROD-VLAN3908-SUBINT",
+					"templateType": "cisco_vpn_interface"
+				},
+				{
+					"templateName": "PROD-EDGE-CLIENT-OSPF",
+					"templateType": "cisco_ospfv3"
+				}
+			]
+		}
+	]
+}
+{% endif %}

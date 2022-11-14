@@ -1,0 +1,4 @@
+Value MAC_ADDRESS (\S*)
+
+Start
+  ^\s*mac-address\s+${MAC_ADDRESS}

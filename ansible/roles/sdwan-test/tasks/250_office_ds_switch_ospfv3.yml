@@ -1,0 +1,24 @@
+---
+#TEST 1 & 2
+- name: "TEST 255 OSPFv3: GET CONNECTED IP"
+  cisco.ios.ios_command:
+    commands:
+      - show ospfv3 vrf 10 neighbor
+      - show ospfv3 vrf 12 neighbor
+    wait_for:
+      - result[0] contains Neighbor
+      - result[1] contains Neighbor
+  register: ip_ospfv3_neighbor
+
+- name: "TEST 255 OSPFv3: REGISTER OUTPUT OSPF vrf 10"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'critical', 'description':'Test OSPFv3 neighbor vpn10 services', 'name':'test_255', 'successful': 'FULL' in ip_ospfv3_neighbor.stdout[0] }] }}"
+
+
+- name: "TEST 260 OSPFv3: REGISTER OUTPUT OSPF vrf 12"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'critical', 'description':'Test OSPFv3 neighbor vpn12 services', 'name':'test_260', 'successful': 'FULL' in ip_ospfv3_neighbor.stdout[1] }] }}"

@@ -1,0 +1,15 @@
+---
+#TEST 1 & 2
+- name: "TEST 5 Verify SDWAN controllers"
+  cisco.ios.ios_command:
+    commands:
+      - show sdwan control connections
+    wait_for:
+      - result[0] contains PEER
+  register: sdwan_controller
+
+- name: "TEST 3 sdwan controller: check peer status"
+  block:
+    - ansible.builtin.set_fact:
+        test_result:
+          "{{ test_result + [{ 'severity':'critical', 'description':'Test SDWAN peer controllers', 'name':'test_5', 'successful': not 'down' in sdwan_controller.stdout[0] }] }}"

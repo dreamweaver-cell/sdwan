@@ -1,0 +1,44 @@
+---
+# - name: Pre Site Acceptance Test (SAT)
+#   hosts: sdwan
+#   connection: network_cli
+#   gather_facts: false
+
+#   tasks:
+
+
+# test connectivity on H&M internal network
+    - name: TEST INTERNET - Test reachability TO internet
+      cisco.ios.ios_ping:
+        dest: 8.8.8.8
+        vrf: '900'
+      register: pre_internet_test
+
+
+    - name: TEST 100 - Test reachability and latency to GPR (STH) rotuer in MGMT vrf (vManage vpn 5)
+      cisco.ios.ios_ping:
+        dest: 10.0.15.64
+        vrf: '12'
+      register: ping_sth_gpr_a
+
+    - ansible.builtin.set_fact:
+        latency_pre: "{{ latency_pre | default({}) | combine( { 'sth': ping_sth_gpr_a['rtt']['avg'] } ) }}"
+
+    - name: TEST 105 - Test reachability and latency to GPR (HKG) rotuer in MGMT vrf (vManage vpn 5)
+      cisco.ios.ios_ping:
+        dest: 10.0.159.64
+        vrf: '12'
+      register: ping_hkg_gpr_a
+
+    - ansible.builtin.set_fact:
+          latency_pre: "{{ latency_pre | default({}) | combine( { 'hkg': ping_hkg_gpr_a['rtt']['avg'] } ) }}"
+
+    - name: TEST 110 - Test reachability and latency to GPR (SEC) rotuer in MGMT vrf (vManage vpn 5)
+      cisco.ios.ios_ping:
+        dest: 10.0.79.64
+        vrf: '12'
+      register: ping_sec_gpr_a
+      ignore_errors: true
+
+    - ansible.builtin.set_fact:
+          latency_pre: "{{ latency_pre | default({}) | combine( { 'sec': ping_sec_gpr_a['rtt']['avg'] } ) }}"

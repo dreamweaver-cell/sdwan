@@ -1,0 +1,31 @@
+{# Provisioning template pop zscaler v1.0 #}
+{
+	"generalTemplates": [
+    {
+        "templateName": "PROD-EDGE-CLI-CONFIG-ZSCALER-IPSEC",
+        "templateType": "cli-template"
+    },
+	{% if "C1111" in part_number %}
+		{
+			"templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+			"templateType": "cisco_vpn"
+			{% if vlan12_sub_if_name is defined and vlan12_sub_if_name %},
+			"subTemplates": [{
+				"templateName": "PROD-VLAN12-SVI-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}] {% endif %}
+		}
+	{% endif %}
+	{% if "ISR4" in part_number %}
+		{
+			"templateName": "PROD-EDGE-CLIENT-VPN12-ZSCALER-IPSEC",
+			"templateType": "cisco_vpn"
+			{% if vlan12_sub_if_name is defined and vlan12_sub_if_name %},
+			"subTemplates": [{
+				"templateName": "PROD-VLAN12-SUBINT-VRRP-{{redundant_router_type|upper}}",
+				"templateType": "cisco_vpn_interface"
+			}] {% endif %}
+		}
+	{% endif %}
+	]
+}

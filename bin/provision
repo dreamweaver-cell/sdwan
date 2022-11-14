@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]
+then
+  echo "MUST GIVE HOSTNAME AS ARGUMENT"
+  exit 1
+fi
+HOSTNAME=$1
+
+function failed() {
+  echo "FAILED: ${1} for ${HOSTNAME}";
+  ansible-playbook -i inventory --limit "${HOSTNAME}" notify_play.yml -e color="EE0000" -e "msg='Premigration failed on ${1}'";
+  exit 1;
+}
+
+# Run Provisioning script
+snap ${HOSTNAME} || { failed "snap"; }
+
+# Detach template in vmanage
+ansible-playbook -i inventory --limit "${HOSTNAME}"  detach_template_play.yml || { failed "push template"; }
+
+# Push device template to vManage
+ansible-playbook -i inventory --limit "${HOSTNAME}"  push_device_template_play.yml || { failed "push template"; }
+
+# Attach template in vmanage
+snap --attach ${HOSTNAME} || { failed "snap-attach"; }

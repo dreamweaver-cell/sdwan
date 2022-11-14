@@ -1,0 +1,24 @@
+---
+- name: Creating Ctask
+  servicenow.servicenow.snow_record:
+    state: present
+    table: change_task
+    username: "{{ sn_username }}"
+    password: "{{ sn_password }}"
+    instance: "{{ sn_instance }}"
+    data:
+      parent: "{{ sn_change_nr }}"
+      change_request: "{{ sn_change_nr }}"
+      short_description: "{{ sn_short_description }}"
+      description: "{{ sn_description }}"
+      business_service: "{{ sn_business_service }}"
+      service_offering: "{{ sn_service_offering }}"
+      cmdb_ci: "{{ sn_cmdb_ci }}"
+      planned_start_date: "{{ sn_start_date }}"
+      planned_end_date: "{{ sn_end_date }}"
+      change_task_type: "review"
+  register: sn_ctask
+  delegate_to: localhost
+
+- ansible.builtin.set_fact:
+    sn_ctask_nr:  "{{ sn_ctask.record.number }}"

@@ -1,0 +1,78 @@
+---
+- hosts: sdwan
+  gather_facts: false
+  connection: local
+  tasks:
+
+  - name: Check if --limit is set
+    ansible.builtin.fail:
+      msg: "you must use -l or --limit"
+    when: ansible_limit is not defined
+    run_once: true
+
+  #- name: Check if --extra-vars is set
+  #  ansible.builtin.fail:
+  #    msg: "you must use -e or --extra-vars chassi=c1111|c4431|c4331"
+  #  when: chassi is not defined
+  #  run_once: true
+
+  # Section 1:
+  # This section sets the interface naming to SDWAN standard
+  - ansible.builtin.include_vars:
+      ansible.builtin.file: "templify/{{ inventory_hostname }}.yml"
+      name: router
+
+  - ansible.builtin.set_fact: 
+      chassi: "c4431"
+    when: router.part_number == "ISR4431/K9"
+
+  - ansible.builtin.set_fact: 
+      chassi: "c4331"
+    when: router.part_number == "ISR4331/K9"
+
+  - ansible.builtin.set_fact: 
+      chassi: "c1111"
+    when: router.part_number == "C1111-8PWE"
+
+  - name: Load hardware defaults
+    ansible.builtin.include_vars: "templates/sdwan_hw_{{ chassi }}.yml"
+
+  - ansible.builtin.debug:
+      var: internet_interface
+    
+
+  # Section 2:
+  # This section will check if a json configuration file already exists. If it finds a already used json
+  # it will load that json file and extract the configured interface setup. if the file does not exists it will treat
+  # this as a new installation and assign interfaces according to /templates/c[hardware version].json
+
+  # - name: Check if {{ inventory_hostname }} has a json definition file in /SDWAN/snapconfig/
+  #  stat:
+  #    path: /SDWAN/snapconfig/{{ inventory_hostname }}.json
+  #  register: stat_result
+
+  #- name: Load JSON file if exists
+  #  ansible.builtin.set_fact:
+  #    installed_interfaces: "{{ lookup('file', '/SDWAN/snapconfig/{{ inventory_hostname }}.json') | from_json }}"
+  #  when: stat_result.stat.exists
+
+  #- name: Change hardware defaults to existing variables
+  #  ansible.builtin.set_fact:
+  #    internet_interface: "{{ installed_interfaces.services.internet[0] }}"
+  #    vpls_interface: "{{ installed_interfaces.services.lan[0].split('.')[0] }}"
+  #    lan_interface: "{{ installed_interfaces.services.lan[0].split('.')[0] }}"
+  #  when: stat_result.stat.exists
+
+  #- ansible.builtin.debug:
+  #    var: "{{ internet_interface  }}"
+
+  # Section 3:
+  # This section will load the yaml configuration file provided in the templify directory. It will read the variables
+  # and create a new sdwan json configuration file in the /templify directory.
+
+
+  - name: Deploy configuration sdwan json configuration
+    ansible.builtin.copy:
+      content: "{{ lookup('template', 'templates/sdwan_template.j2') | to_nice_json(sort_keys=False) }}"
+      # content: "{{ lookup('template', 'templates/sdwan_template.j2') }}"
+      dest: "/SDWAN/snapconfig/{{ inventory_hostname }}.json"

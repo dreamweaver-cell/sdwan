@@ -1,0 +1,12 @@
+---
+- name: SNOW Change Request Close by username
+  become: false
+  hosts: sdwan
+  gather_facts: false
+
+  tasks:
+  - block:
+    - name: Close Service-Now Request
+      ansible.builtin.include_role:
+        name: "../../roles/snow_change"
+        tasks_from: close_change_task.yml

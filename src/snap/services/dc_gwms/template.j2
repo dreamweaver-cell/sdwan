@@ -1,0 +1,29 @@
+{# Provisioning template gwms Facility v1.0 #}
+
+{# Hardware Cisco ISR 4k #}
+{% if "C1111" in part_number %}
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-LAN-VPN10-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+			"templateName": "PROD-VLAN551-SVI-VRRP-{{redundant_router_type|upper}}",
+			"templateType": "cisco_vpn_interface"
+		}]
+	}]
+}
+{% endif %}
+
+{# Hardware Cisco ISR 4k #}
+{% if "ISR4" in part_number %}
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-LAN-VPN10-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+			"templateName": "PROD-VLAN551-SUBINT-VRRP-{{redundant_router_type|upper}}",
+			"templateType": "cisco_vpn_interface"
+		}]
+	}]
+}
+{% endif %}

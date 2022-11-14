@@ -1,0 +1,13 @@
+- name: fetching mac address from {{ inventory_hostname }}
+  cisco.ios.ios_command:
+    commands:
+      - show mac address-table
+  register: ip_mac_db
+- cisco.ios.ios_facts:
+    gather_subset: all
+- ansible.builtin.set_fact:
+    mac_table: "{{ ip_mac_db.stdout[0] | parse_cli_textfsm('/workspaces/sdwan/dot1x/ntc-templates/cisco_ios_show_mac-address-table.textfsm') }}"
+- ansible.builtin.set_fact:
+    MAC_ADDRESS: "{{ MAC_ADDRESS | default([]) | combine( { item['DESTINATION_ADDRESS']:  item['DESTINATION_ADDRESS']|mac_to_vendor} ) }}"
+  when: item.TYPE == 'DYNAMIC'
+  loop: "{{ mac_table }}"

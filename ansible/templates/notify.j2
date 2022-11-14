@@ -1,0 +1,15 @@
+<h2><b>{{ inventory_hostname }}</b></h2>
+{{ now(fmt="%Y-%m-%d %H:%M:%S") }} {{ inventory_hostname }}: <b>{{ message }}</b>
+{% if sn_change is defined and sn_change.record['number'] %}
+    <p> changenr: <a href="https://{{ sn_instance }}.service-now.com/nav_to.do?uri=change_request.do?sysparm_query=number={{ sn_change.record['number'] }}">{{ sn_change.record['number'] }} </a></p>
+{% endif %}
+{% if table is defined and table %}
+<hr>
+<table style="width:100%">
+    {% for key, value in table.items() %}
+    <tr>
+        <td>{{ key }}</td><td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

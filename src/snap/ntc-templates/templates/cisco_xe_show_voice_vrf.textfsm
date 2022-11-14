@@ -1,0 +1,7 @@
+Value VOICE_VRF (\S*)
+Value SIP_VRF (\S*)
+
+
+Start
+  ^Global\s*voice\s*vrf\s*defined\s*is:\s+${VOICE_VRF}
+  ^Global\s*sip\s*bind\s*for\s*vrf\s*is\s*:\s+${SIP_VRF} -> Record

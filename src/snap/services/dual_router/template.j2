@@ -1,0 +1,39 @@
+{# Provisioning template Dual router  v1.0 #}
+
+{% if services.dual_router.service_interconnect_tloc_destination %}
+    {% set tloc = "DEST" %}
+{% elif services.dual_router.service_interconnect_tloc_source  %}
+    {% set tloc = "SOURCE" %}
+{% else %}
+	{% set tloc = false %}
+{% endif %}
+
+{% if tloc != false %}
+	{% if redundant_router_type == "pri" %}
+	{
+		"generalTemplates": [{
+			"templateName": "PROD-EDGE-VPN0-V2",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-INET-{{ tloc }}-TLOC-EXT-{{ region|upper }}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		}]
+	}
+	{% endif %}
+
+	{% if redundant_router_type == "sec" %}
+	{
+		"generalTemplates": [{
+			"templateName": "PROD-EDGE-VPN0-V2",
+			"templateType": "cisco_vpn",
+			"subTemplates": [{
+				"templateName": "PROD-INET-{{ tloc }}-TLOC-EXT-{{ region|upper }}",
+				"templateType": "cisco_vpn_interface"
+			}]
+		}]
+	}
+	{% endif %}
+{% else %}
+	{ }
+{% endif %}

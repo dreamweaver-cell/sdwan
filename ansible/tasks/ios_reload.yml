@@ -1,0 +1,27 @@
+---
+# - name: Reload and validate installation
+#   hosts: sdwan
+#   connection: network_cli
+#   gather_facts: false
+
+#   tasks:
+
+- name: Copy Running Configuration To Startup Configuration
+  cisco.ios.ios_command:
+    commands:
+      - command: copy running-config startup-config
+        prompt: 'Destination filename \[startup-config\]'
+        answer: "\r"
+
+- name: Reload
+  cisco.ios.ios_command:
+    commands:
+      - command: "reload in 1"
+        prompt:
+          - "Save"
+          - "confirm"
+          - "Proceed"
+        answer:
+          - y
+          - y
+          - y

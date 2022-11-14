@@ -1,0 +1,9 @@
+{
+    {% set internet_if = services.internet.interfaces[0] %}
+    "internet_if_name": "{{ internet_if }}",
+    "internet_if_description": "{{ interfaces.get(internet_if).description }}",
+    "internet_shaping_rate": "{{ interfaces.get(internet_if).bandwidth }}",
+    "internet_if_secondary_address": "TEMPLATE_IGNORE",
+    "vpn800_static_nat_translate_ip": "TEMPLATE_IGNORE",
+    "vpn800_static_nat_source_ip":  "TEMPLATE_IGNORE"
+}

@@ -1,0 +1,17 @@
+
+{
+{% if "ISR4" in part_number %}
+    "generalTemplates": [
+        {
+            "templateName": "PROD-EDGE-VPN0-V2",
+            "templateType": "cisco_vpn",
+            "subTemplates": [
+                {
+                    "templateName": "PROD-EDGE-LAN-PARENT-INTERFACE",
+                    "templateType": "cisco_vpn_interface"
+                }
+            ]
+        }
+    ]
+{% endif %}
+}

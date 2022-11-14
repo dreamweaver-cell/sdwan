@@ -1,0 +1,22 @@
+- name: Initiating service-now process
+  block:
+    # Create the change
+    - name: Create a change  in service-now
+      ansible.builtin.include: create_change.yml
+
+    # Create the ctask
+    - name: Create a ctask in service-now
+      ansible.builtin.include: create_ctask.yml
+
+    # Move Change to implement
+    - name: Move change {{ sn_change_nr }} push change to implement
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change_nr }}"
+        data:
+          state: "{{ item }}"
+      loop: "[{{ SN_APPROVAL }}, {{ SN_SCHEDULE }}]"

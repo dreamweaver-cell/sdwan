@@ -1,0 +1,5 @@
+Value VOICE_VRF (\S*)
+
+
+Start
+  ^voice\s*vrf\s+${VOICE_VRF}

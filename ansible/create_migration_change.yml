@@ -1,0 +1,37 @@
+---
+- name: Schedule SNOW change for migration
+  become: false
+  hosts: sdwan
+  gather_facts: false
+
+  vars:
+    TZ: "{{ lookup('ansible.builtin.pipe', 'date +%Z') }}"
+    start: ""
+
+  tasks:
+    - ansible.builtin.set_fact:
+        START_OPT: "-d '{{ TZ+start }}'"
+        end: '{{lookup(''pipe'',''date -d "''+start+'' 3 hours" +%Y-%m-%d" "%H:%M:00'')}}'
+      when: start
+
+    - ansible.builtin.set_fact:
+        START_OPT: ""
+        end: '{{lookup(''pipe'',''date -d "3 hours" +%Y-%m-%d" "%H:%M:00'')}}'
+      when: not start
+
+    - ansible.builtin.set_fact:
+        sn_start_date: '{{lookup(''pipe'',''date -u ''+START_OPT+'' +%Y-%m-%d" "%H:%M:00'')}}'
+        sn_end_date: '{{lookup(''pipe'',''date -u -d "''+TZ+end+''" +%Y-%m-%d" "%H:%M:00'')}}'
+
+    - name: Create Service-Now Request
+      ansible.builtin.include_role:
+        name: snow_change
+        tasks_from: create_change_task.yml
+
+    # Send notificatoin to service-now
+    - name: Notify Service-Now details to NetDevOps
+      ansible.builtin.include_role:
+        name: ../roles/notify
+        tasks_from: snow_change_created.yml
+      with_items:
+        - "{{ migration_webhook }}"

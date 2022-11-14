@@ -1,0 +1,17 @@
+{# Provisioning template Office voice CLI template v1.0 #}
+{
+	"generalTemplates": [{
+		"templateName": "PROD-EDGE-CLI-VOICE-{{device_name|upper}}",
+		"templateType": "cli-template"
+	}
+	{% if "Loopback10" in services.office_voice.interfaces %}
+		,{
+		"templateName": "PROD-EDGE-LAN-VPN10-V2",
+		"templateType": "cisco_vpn",
+		"subTemplates": [{
+			"templateName": "PROD-VOICE-LO10",
+			"templateType": "cisco_vpn_interface"
+		}]
+	}
+    {% endif %}]
+}

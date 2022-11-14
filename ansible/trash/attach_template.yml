@@ -1,0 +1,38 @@
+---
+- name: Attach device template to device
+  hosts: sdwan
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.set_fact:
+        table: "{{ table | default({}) | combine( { item: sdwan.get(item) } ) }}"
+      loop:
+        - system_site_id
+        - system_system_ip
+        - internet_if_ipv4_address
+        - vpn0_next_hop_ip_address
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Attaching template."
+        hooks:
+          - "{{ migration_webhook }}"
+      ignore_errors: true
+
+    - name: Attach template to device
+      vmanage_device_attachment:
+        user: "{{ vmanage_user }}"
+        host: "{{ vmanage_host }}"
+        password: "{{ vmanage_password }}"
+        device: "{{ inventory_hostname }}"
+        uuid: "{{ sdwan.part_number }}-{{ sdwan.crypto_sn }}"
+        system_ip: "{{ sdwan.system_system_ip }}"
+        site_id: "{{ sdwan.system_site_id }}"
+        template: "{{ inventory_hostname }}-snap"
+        variables: "{{ sdwan | default(omit) }}"
+        wait: true
+        state: "present"
+      delegate_to: localhost
+      #      when: sdwan is defined
+      register: attachment_results

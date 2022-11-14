@@ -1,0 +1,17 @@
+---
+# tasks file for network_vmanage
+
+- name: Detach template to vManage 
+  include: template_detach.yml
+  tags:
+    - detach
+
+- name: Push template to vManage 
+  include: template_push.yml
+  tags:
+    - push
+
+- name: Attach template to vManage 
+  include: template_attach.yml
+  tags:
+    - attach

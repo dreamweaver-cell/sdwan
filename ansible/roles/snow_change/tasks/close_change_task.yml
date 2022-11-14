@@ -1,0 +1,93 @@
+---
+- name: Initiating service-now process
+  block:
+    - name: "SEARCH CHAGNGE RELATED TO {{ inventory_hostname }}"
+      servicenow.servicenow.snow_record_find:
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        query:
+          AND:
+            equals:
+              active: "True"
+              short_description: "MIG-{{ inventory_hostname }}"
+        return_fields:
+          - number
+          - state
+      register: sn_change_nr
+
+    - name: "SEARCH CTASK RELATED TO {{ inventory_hostname }}"
+      servicenow.servicenow.snow_record_find:
+        table: change_task
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        query:
+          AND:
+            equals:
+              active: "True"
+              short_description: "MIG-{{ inventory_hostname }}"
+        return_fields:
+          - number
+          - state
+      register: sn_ctask_nr
+- block:
+    - name: check nr of changes
+      ansible.builtin.fail:
+        msg: "Multiple changes found, please close manually {{ sn_change_nr.record }}"
+      when: sn_change_nr.record | length > 1
+
+    - name: check nr of ctasks
+      ansible.builtin.fail:
+        msg: "Multiple changes found, please close manually {{ sn_change_nr.record }}"
+      when: sn_ctask_nr.record | length > 1
+
+- block:
+    - ansible.builtin.debug:
+        msg: " {{ sn_change_nr.record[0].number }}"
+    - ansible.builtin.debug:
+        msg: " {{ sn_ctask_nr.record[0].number }}"
+
+  rescue:
+    - ansible.builtin.debug:
+        msg: "CHANGE: {{ sn_change_nr.record[0] | default('None') }} TASK: {{ sn_ctask_nr.record[0].number | default('None') }}"
+    - ansible.builtin.fail:
+        msg: "The playbook did not find any matching change or task for short_description MIG-{{ inventory_hostname }}"
+
+- block:
+    - name: Move change {{ sn_change_nr }} to next implementation stage
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change_nr.record[0].number }}"
+        data:
+          state: "{{ item }}"
+      with_items: "{{ SN_IMPLEMENT }}"
+      when: sn_change_nr.record[0].state == SN_SCHEDULE
+
+
+    - name: Move change {{ sn_change_nr }} to next review stage
+      servicenow.servicenow.snow_record:
+        state: present
+        table: change_request
+        username: "{{ sn_username }}"
+        password: "{{ sn_password }}"
+        instance: "{{ sn_instance }}"
+        number: "{{ sn_change_nr.record[0].number }}"
+        data:
+          state: "{{ item }}"
+      with_items: "{{ SN_REVIEW }}"
+
+      # Close the change
+    - name: Closelosea change  in service-now
+      ansible.builtin.include: close_ctask.yml
+      with_items: "{{ sn_ctask_nr.record[0].number }}"
+
+    # Close the ctask
+    - name: Close a ctask in service-now
+      ansible.builtin.include: close_change.yml
+      with_items: "{{ sn_change_nr.record[0].number }}"

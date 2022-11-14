@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Prepare the docker environment
+
+# Stop on errors
+set -e
+SCRIPT=$(readlink -f "$0")
+SNAPDIR=$(dirname "$SCRIPT")
+
+echo "KexAlgorithms +diffie-hellman-group1-sha1,diffie-hellman-group14-sha1" >> /etc/ssh/ssh_config.d/oldcisco.conf
+echo "PS1='\[\033[01;32m\]SNAP ($(git tag --sort=-creatordate | head -n 1))\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]> '" >> /root/.bashrc
+echo "export PATH=$PATH:${SNAPDIR}/bin" >> /root/.bashrc
+mkdir -p /etc/ansible/
+cp -a ./ansible/ansible.cfg /etc/ansible/

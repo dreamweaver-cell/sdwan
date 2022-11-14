@@ -1,0 +1,411 @@
+{
+    "version": "1.3",
+    "device_name": "dehamso1rtr001",
+    "part_number": "ISR4431/K9",
+    "software_version": "16.9.5",
+    "device_serial_number": "FOC23158M4D",
+    "routing": {
+        "static": []
+    },
+    "redundant_router_type": "pri",
+    "services": {
+        "vpls": {
+            "interfaces": [
+                "GigabitEthernet0/0/0"
+            ],
+            "enabled": true
+        },
+        "interconnect": {
+            "interfaces": [
+                "GigabitEthernet0/0/2.3900",
+                "GigabitEthernet0/0/2.3906",
+                "GigabitEthernet0/0/2.3999"
+            ],
+            "enabled": true
+        },
+        "lan": {
+            "interfaces": [
+                "GigabitEthernet0/0/3.2",
+                "GigabitEthernet0/0/3.5",
+                "GigabitEthernet0/0/3.12",
+                "GigabitEthernet0/0/3.100",
+                "GigabitEthernet0/0/3.927",
+                "GigabitEthernet0/0/3.928"
+            ],
+            "enabled": true
+        },
+        "mgmt_eth": {
+            "interfaces": [
+                "GigabitEthernet0"
+            ],
+            "enabled": true
+        },
+        "mgmt": {
+            "interfaces": [
+                "Loopback5"
+            ],
+            "enabled": true
+        },
+        "office_voice": {
+            "enabled": true
+        },
+        "dual_router": {
+            "service_interconnect_tloc_destination": true,
+            "service_interconnect_tloc_source": false,
+            "internet_source_pri": "GigabitEthernet0/0/2",
+            "internet_source_sec": "GigabitEthernet0/0/2",
+            "dual_router_internet_ipv4": "80.239.246.138/29",
+            "internet_source_bw": 200000,
+            "enabled": true
+        },
+        "zscaler_ipsec": {
+            "interfaces": [
+                "Tunnel50",
+                "Tunnel51"
+            ],
+            "enabled": true
+        }
+    },
+    "interfaces": {
+        "GigabitEthernet0/0/0": {
+            "description": "VPLS REGIONAL WAN | PROVIDER: TELIA | CIRCUIT-ID: FNT-188665/IC-346197 | MAC 0200.0a00.002d | 100 M",
+            "bandwidth": 100000,
+            "phys_address": "2c4f.522f.2320",
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps",
+            "mtu": 1562,
+            "ipv4": "10.0.0.45/23",
+            "mac_address": "2c:4f:52:2f:23:20"
+        },
+        "GigabitEthernet0/0/1": {
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2321",
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps"
+        },
+        "GigabitEthernet0/0/2": {
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2322",
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps"
+        },
+        "GigabitEthernet0/0/2.3900": {
+            "description": "** VRF STH-CLIENT: INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2322",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "192.0.2.0/31"
+        },
+        "GigabitEthernet0/0/2.3906": {
+            "description": "** VRF lan: INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2322",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "192.0.2.2/31"
+        },
+        "GigabitEthernet0/0/2.3999": {
+            "description": "** VRF MGMT: INTERCONNECT SITE WAN ROUTER",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2322",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "10.20.12.250/31"
+        },
+        "GigabitEthernet0/0/3": {
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2323",
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "1000mbps"
+        },
+        "GigabitEthernet0/0/3.2": {
+            "description": "** VRF CLIENT: LAN ADDRESS",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2323",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "10.22.110.165",
+                "10.22.112.50",
+                "10.61.95.125",
+                "10.61.95.126"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.21.1.2/22",
+            "standby": "10.21.1.1"
+        },
+        "GigabitEthernet0/0/3.5": {
+            "description": "** VRF MGMT: INFRASTRUCTURE MANGEMENT",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2323",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1500,
+            "ipv4": "10.20.9.162/29",
+            "standby": "10.20.9.161"
+        },
+        "GigabitEthernet0/0/3.12": {
+            "description": "** VRF LAN: LAN ADDRESS",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2323",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126",
+                "10.22.112.50"
+            ],
+            "vrf": "vpn12",
+            "mtu": 1500,
+            "ipv4": "10.188.157.2/24",
+            "standby": "10.188.157.1"
+        },
+        "GigabitEthernet0/0/3.100": {
+            "description": "** VRF CLIENT: LAN ADDRESS",
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.2323",
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "helper_address": [
+                "10.61.95.125",
+                "10.61.95.126"
+            ],
+            "vrf": "vpn10",
+            "mtu": 1500,
+            "ipv4": "10.21.100.2/24",
+            "standby": "10.21.100.1"
+        },
+        "Service-Engine0/1/0": {
+            "bandwidth": 750000,
+            "phys_address": "d0ec.35e6.6a1c",
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:0": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:1": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:2": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:3": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:4": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:5": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:6": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:7": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:8": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:9": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:10": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:11": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:12": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:13": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:14": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:15": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:16": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:17": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:18": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:19": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:20": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:21": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:22": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Serial0/1/0:23": {
+            "bandwidth": 64,
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "Service-Engine0/4/0": {
+            "bandwidth": 750000,
+            "phys_address": "2c4f.522f.2320",
+            "port_channel": {
+                "port_channel_member": false
+            }
+        },
+        "GigabitEthernet0": {
+            "bandwidth": 1000000,
+            "phys_address": "2c4f.522f.238f",
+            "auto_negotiate": true,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "port_speed": "auto speed",
+            "vrf": "Mgmt-intf",
+            "mtu": 1500,
+            "ipv4": "dhcp_negotiated"
+        },
+        "Loopback5": {
+            "description": "** MANAGEMENT INTERFACE",
+            "bandwidth": 8000000,
+            "port_channel": {
+                "port_channel_member": false
+            },
+            "vrf": "vpn5",
+            "mtu": 1514,
+            "ipv4": "10.20.12.248/32"
+        },
+        "GigabitEthernet0/0/3.927": {
+            "description": "**LIB_HM_WIFI_GUEST**",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": "false"
+            },
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "mtu": 1500,
+            "ipv4": "172.16.0.2/22",
+            "standby": "172.16.0.1"
+        },
+        "GigabitEthernet0/0/3.928": {
+            "description": "**LIB_HM_WIFI_ACCESS**",
+            "bandwidth": 1000000,
+            "port_channel": {
+                "port_channel_member": "false"
+            },
+            "vrf": "vpn900",
+            "inbound_access_list": "ANTISPOOF-LIB-ACL-IN-IPV4",
+            "mtu": 1500,
+            "ipv4": "172.16.8.2/21",
+            "standby": "172.16.8.1"
+        }
+    }
+}

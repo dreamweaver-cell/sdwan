@@ -1,0 +1,8 @@
+---
+# vars file for sdwan-test
+
+test_result: []
+latency_pre: {}
+latency_post: {}
+pre_migration: false
+run_pretest: false

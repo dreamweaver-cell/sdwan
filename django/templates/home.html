@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<!-- Page Content -->
+    <p>This site is a quick tool to be used by TCS operations to edit and upload SDWAN - configuraitons.</p>
+<hr>
+    <h4>SDWAN 'internet' service</h4>
+    Describe service here .... <br><br>
+    <b>example:</b>
+    <pre class="json">
+    "services": {
+        "internet": [
+            "GigabitEthernet0/0/0",
+            "GigabitEthernet0/0/1",
+        ]
+    }
+    </pre >
+    <hr>
+    <h4>SDWAN 'lan' service</h4>
+    Describe service here .... <br><br>
+    <b>example: </b>
+    <pre class="json">
+        "services": {
+            "lan": [
+                "Vlan927",
+                "Vlan928",
+                "Vlan2",
+                "Vlan12"
+            ]
+        }
+    </pre>
+{% endblock %}

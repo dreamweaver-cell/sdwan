@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+
+[tool.yapfignore]
+ignore_patterns = [
+  "migration/**/*.py",
+  "dev/*.py"
+]
+
+[tool.pylint.MASTER]
+py-version = "3.9"
+ignore = [
+    "tests",
+    "zed",
+    "swix",
+]
+
+[tool.pylint.BASIC]
+good-names = [
+    "_",
+    "d",
+    "ex",
+    "f",
+    "gt",
+    "fp",
+    "i",
+    "id",
+    "ip",
+    "k",
+    "s",
+    "S",
+    "t",
+    "v",
+    "zs",
+]
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "format",
+    "abstract-method",
+    "cyclic-import",
+    "duplicate-code",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "inconsistent-return-statements",
+    "locally-disabled",
+    "not-context-manager",
+    "too-few-public-methods",
+    "too-many-ancestors",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-instance-attributes",
+    "too-many-lines",
+    "too-many-locals",
+    "too-many-public-methods",
+    "too-many-return-statements",
+    "too-many-statements",
+    "too-many-boolean-expressions",
+    "unused-argument",
+    "unused-import",
+    "wrong-import-order",
+    "consider-using-f-string",
+    "no-self-use",
+    "consider-using-namedtuple-or-dataclass",
+    "consider-using-assignment-expr",
+]
+
+[tool.pylint.CODE_STYLE]
+max-line-length-suggestions = 99

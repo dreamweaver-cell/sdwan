@@ -1,0 +1,11 @@
+---
+- name: Creating device tenplate in vmanage
+  hosts: sdwan
+  connection: local
+  gather_facts: false
+
+  vars:
+    template_file: "{{ inventory_hostname }}.json"
+
+  tasks:
+      - ansible.builtin.import_tasks: ./tasks/push_device_template.yml

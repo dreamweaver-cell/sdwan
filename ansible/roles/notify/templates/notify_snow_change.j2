@@ -1,0 +1,13 @@
+<h2><b>Service-Now change created for host {{ inventory_hostname }}</b></h2>
+{{ now(fmt="%Y-%m-%d %H:%M:%S") }}: <b>{{ sn_change.record.short_description }}</b><br>
+<hr>
+<table style="width:100%">
+<tr>
+    <th>ChangeID</th><th>CTASK ID</th><th>Start time</th><th>End date</th>
+</tr>
+<tr>
+    <td>{{ sn_change_nr }}</td>
+    <td>{{ sn_ctask_nr }}</td>
+    <td>{{ sn_ctask.record.planned_start_date }}</td>
+    <td>{{ sn_ctask.record.planned_end_date }}</td>
+</tr>

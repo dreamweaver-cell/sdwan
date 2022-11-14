@@ -1,0 +1,163 @@
+---
+- name: SNAP attach to vmanage
+  hosts: sdwan
+  connection: network_cli
+  gather_facts: false
+
+  vars:
+    template_file: "{{ inventory_hostname }}.json"
+
+  tasks:
+    # Verify if the router is attached to Vmanage
+    - ansible.builtin.import_tasks: vmanage_authentication.yml
+
+    # Verify that the router is migrated to SDWAN
+
+    - name: show sdwan connections
+      cisco.ios.ios_command:
+        commands: show ip vrf
+      register: output
+      failed_when: false
+    - ansible.builtin.set_fact:
+        migrated: "{{ 'MGMT' not in output.stdout[0] }}"
+
+    # Get full list of devices from vmanage and filter out ansible-limit from list of dictionary
+    - name: Get template list from vmanage
+      uri:
+        url: "https://{{ vmanage_host }}/dataservice/template/device"
+        method: GET
+        headers:
+          Content-Type: "application/json"
+          Cookie: "{{ vauth.cookies_string }}"
+        validate_certs: false
+        body_format: json
+      register: data
+
+    - ansible.builtin.set_fact:
+        attached: "{{ data.json.data | selectattr('templateName', 'eq', ansible_limit+'-snap') | map(attribute='devicesAttached')}}"
+
+    - debug:
+        msg: "Attached to vmanage"
+      when: attached[0] is defined and attached[0] == 1
+
+    # Check if there is a dif in vmanage and the router
+    - name: Diff SNAP file to VMANAGE
+      vmanage_diff:
+        hostname: "{{ inventory_hostname }}"
+        log: true
+      register: pre_snap_sync
+      ignore_errors: true
+      when: attached[0] is defined and attached[0] == 1
+
+    # Run block if not in sync
+    - name: Run syncronization
+      block:
+        - name: check limit is set
+          ansible.builtin.fail:
+            msg: "you must use -l or --limit"
+          when: ansible_limit is not defined
+          run_once: true
+
+        # Run basic connectivity Pre tests
+        - ansible.builtin.import_tasks: ios_sat_test_pre_sdwan.yml
+
+        # Get pre SAT test (ios) show ip route summary
+        - ansible.builtin.import_tasks: ios_show_ip_route_summary.yml
+
+        # Detach device template to Vmanage
+        - ansible.builtin.import_tasks: detach_template.yml
+          ignore_errors: true
+
+        # Push device template to Vmanage
+        - ansible.builtin.import_tasks: push_device_template.yml
+
+        # Migrate Zscaler IPSEC2GRE
+        - name: Migrate GRE template to IPsec in Zscaler portal
+          command: zs migrate {{ inventory_hostname }}
+          run_once: true
+          ignore_errors: true
+          delegate_to: localhost
+          tags: [never, zs_migrate]
+
+        # Attach new device
+        - name: Attach device templates and variables to Vmanage
+          command: snap --attach {{ inventory_hostname }}
+          run_once: true
+          delegate_to: localhost
+
+        # Run basic connectivity tests
+        - ansible.builtin.import_tasks: ios_sat_basic_connectivity.yml
+          ignore_errors: true
+
+        # Get post SAT test (ios) show ip route summary
+        - ansible.builtin.import_tasks: ios_show_ip_route_summary.yml
+          ignore_errors: true
+          tags: post
+
+        # Change summary
+        - ansible.builtin.set_fact:
+            sat_code: unsuccessful
+
+        - name: Connectivity teset
+          ansible.builtin.set_fact:
+            validate_connectivity: "successful"
+          when: not (test1.failed and test2.failed and test3.failed)
+
+        - name: Route table comparison
+          ansible.builtin.set_fact:
+            validate_route: "successful"
+          when: routes_vrf_10 == post_routes_vrf_10 and routes_vrf_12 == post_routes_vrf_12
+
+        # Check if diff is syncronized
+        - name: Diff SNAP file to VMANAGE
+          vmanage_diff:
+            hostname: "{{ inventory_hostname }}"
+            log: true
+          register: snap_sync
+
+        - name: Compare configuration
+          ansible.builtin.set_fact:
+            validate_configuration: "successful"
+          when: snap_sync['meta']['change']|length==0 or snap_sync['meta']['add']|length==0 or snap_sync['meta']['remove']|length==0 or snap_sync['meta']['variables']|length==0 and attached[0] == 0
+
+        - name: Set sat_code
+          ansible.builtin.set_fact:
+            sat_code: "successful"
+          when: (validate_connectivity and validate_route and validate_configuration) is defined
+
+        # and device_neighbors|length > 2 REMOVED FORM SAT TEST
+        - name: Write Change notes
+          ansible.builtin.set_fact:
+            sat_note:
+              - playbook: "The Playbook was: {{ sat_code }}"
+              - test0: "Vmanage in Synk: {{ 'successful' if validate_configuration }}"
+              - test1: "Connected vrf 10 route count: {{ 'successful' if routes_vrf_10 == post_routes_vrf_10 else 'unsuccessful' }}"
+              - test2: "Connected vrf 12 route count: {{ 'successful' if routes_vrf_12 == post_routes_vrf_12 else 'unsuccessful' }}"
+              - test3: "Ping 8.8.8.8 from Guest Wifi: {{ 'successful' if not test1.failed else 'unsuccessful' }}"
+              - test4: "Ping 10.61.95.134 from lan: {{ 'successful' if not test2.failed else 'unsuccessful' }}"
+              - test5: "Ping 10.61.95.134 from mgmt: {{ 'successful' if not test3.failed else 'unsuccessful' }}"
+              - test6.1: "Attach rtt to EMEA:{{ ping_sth_gpr_b.rtt }}"
+              - test6.1: "Attach rtt to APAC:{{ ping_hkg_gpr_b.rtt }}"
+              - test6.1: "Attach rtt to AMER:{{ ping_sec_gpr_b.rtt }}"
+
+        - ansible.builtin.set_fact:
+            msg: "Reprovisioning Successful! &#x1F64C;"
+            color: "00EE00"
+          when: sat_code == "successful"
+
+        - ansible.builtin.set_fact:
+            msg: "Reprovisioning ended with errors"
+            color: "EE0000"
+          when: sat_code == "unsuccessful"
+
+        - ansible.builtin.import_tasks: notify.yml
+          vars:
+            color: "{{ color }}"
+            msg: "{{ msg }}"
+            templ: "notify_post_snap_attach.j2"
+            hooks:
+              - "{{ general_webhook }}"
+              - "{{ devops_channel }}"
+
+      when: migrated and (attached[0] is defined and attached[0] == 1) and (pre_snap_sync['meta']['change']|length>0 or pre_snap_sync['meta']['add']|length>0 or pre_snap_sync['meta']['remove']|length>0 or pre_snap_sync['meta']['variables']|length>0)
+      ignore_errors: true

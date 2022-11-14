@@ -1,0 +1,5 @@
+---
+# vars file for snap-log
+FAIL_LOG_LOGFILE: "collected_statistics.log"
+FAIL_LOG_PATH: "{{playbook_dir }}/../logs/"
+FAIL_LOG_SEVERITY: "{{severity}}"

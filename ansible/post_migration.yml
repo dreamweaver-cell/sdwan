@@ -1,0 +1,68 @@
+---
+- hosts: sdwan
+  gather_facts: false
+  connection: network_cli
+  vars:
+    sn_change:
+      record:
+        number: "{{ change_nr }}"
+    sn_task:
+      record:
+        number: "{{ task_nr }}"
+
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars: change_request_vars.yml
+    - name: check limit is set
+      ansible.builtin.fail:
+        msg: "you must use -l or --limit"
+      when: ansible_limit is not defined
+      run_once: true
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Starting SAT-tests."
+        hooks:
+          - "{{ migration_webhook }}"
+
+    # Execute SAT test and verify connectivity
+    - ansible.builtin.import_tasks: ios_sat_test.yml
+      ignore_errors: true
+
+    # Close Change and Task in Service Now
+    # - name: Close Change and Task in Service Now
+    - ansible.builtin.import_tasks: close_change_task.yml
+      ignore_errors: true
+      when: sn_change.record['number']
+
+    - ansible.builtin.set_fact:
+        table:
+          network diff: "{{ test4.stderr | replace('Network missing:','') }}"
+      when: test4.stderr != ''
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        msg: "Attaching template."
+        hooks:
+          - "{{ migration_webhook }}"
+
+    - ansible.builtin.set_fact:
+        msg: "Migration completed. Site is up in SDWAN-mode! &#x1F64C;"
+        color: "00EE00"
+        templ: "notify_post.j2"
+      when: sat_code == "successful"
+
+    - ansible.builtin.set_fact:
+        msg: "Migration ended with errors"
+        color: "EE0000"
+        templ: "notify_post.j2"
+      when: sat_code == "unsuccessful"
+
+    - ansible.builtin.import_tasks: notify.yml
+      vars:
+        color: "{{ color }}"
+        msg: "{{ msg }}"
+        templ: "notify_post.j2"
+        hooks:
+          - "{{ migration_webhook }}"
+          # - "{{ operations_webhook }}"

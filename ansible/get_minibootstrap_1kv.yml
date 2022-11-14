@@ -1,0 +1,24 @@
+---
+- name: Get Minimal Bootstrap file
+  hosts: sdwan
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+
+  vars:
+    FILENAME: "ciscosdwan_cloud_init.cfg"
+    CFGFILE: "./{{ FILENAME }}"
+    UUID: "{{ sdwan.uuid }}"
+
+  tasks:
+    - name: Delete old bootstrap file in tempdir
+      ansible.builtin.file:
+        path: "{{ CFGFILE }}"
+        state: absent
+        force: true
+      delegate_to: localhost
+
+    - name: copy to file
+      ansible.builtin.copy:
+        content: "{{ lookup('template', 'templates/bootstrapmini_1kv.j2') }}"
+        dest: "{{ CFGFILE }}"
+      delegate_to: localhost

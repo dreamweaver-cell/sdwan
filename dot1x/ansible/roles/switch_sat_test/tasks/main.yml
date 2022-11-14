@@ -1,0 +1,7 @@
+---
+# tasks file for switch_sat_test
+- name: test if any dot1x authentication
+  ansible.builtin.include: 05_verify_dot1x_interface.yml
+
+- name: test reachability to STH HKG SEC
+  ansible.builtin.include: 10_client.yml

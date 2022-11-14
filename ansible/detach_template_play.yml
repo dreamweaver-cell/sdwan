@@ -1,0 +1,7 @@
+---
+- name: Detach device template
+  hosts: sdwan
+  connection: local
+  gather_facts: false
+  tasks:
+    - ansible.builtin.import_tasks: ./task/detach_template.yml

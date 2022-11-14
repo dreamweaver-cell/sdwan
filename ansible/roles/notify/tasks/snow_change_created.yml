@@ -1,0 +1,10 @@
+---
+- name: SNOW - Change and CTASK created
+  community.general.office_365_connector_card:
+    webhook: "{{ item }}"
+    text: "{{ lookup('template', templ | default('notify_snow_change.j2', True) ) }}"
+    color: "{{ color | default('1b7ced') }}"
+  vars:
+    summary: "{{ inventory_hostname }} - ChangeID: {{ sn_change_nr }} - CTASK: {{ sn_task_nr}}"
+  delegate_to: localhost
+  ignore_errors: true
