@@ -8,7 +8,7 @@ Django>=4.0.1
 django-bootstrap5==22.1
 genie==22.5
 hmnet==0.1.35
-jsonschema==4.16.0
+jsonschema==4.17.1
 MarkupSafe==1.1.1
 nested-lookup==0.2.25
 netmiko==3.4.0
