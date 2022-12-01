@@ -12,7 +12,7 @@ jsonschema==4.16.0
 MarkupSafe==1.1.1
 nested-lookup==0.2.25
 netmiko==3.4.0
-pyats==22.5
+pyats==22.11
 pysnow==0.7.17
 python-dotenv==0.21.0
 PyYAML==6.0
